@@ -17,10 +17,10 @@ function Autenticacao() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
+    <div className="min-h-screen flex items-center justify-center sm:bg-gray-50">
+      <div className="w-full max-w-md p-6 bg-white rounded-lg sm:shadow-lg">
         <img
-          src="/placeholder-1600-700.png"
+          src="/logo-bar.png"
           alt="Logo"
           className="w-full bg-white rounded-lg"
         />
@@ -66,7 +66,7 @@ function Autenticacao() {
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.3 }}
             >
-              <Registro />
+              <Registro setActiveTab={setActiveTab} />
             </motion.div>
           )}
         </AnimatePresence>
