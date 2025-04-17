@@ -17,15 +17,16 @@ export const login = async (email, password) => {
   return data;
 };
 
-export const registrar = async (name, email, password) => {
-  const response = await fetch(`${API_URL}/register`, {
+export const registrar = async (nome, email, numero, password) => {
+  const response = await fetch(`${API_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password }),
+    body: JSON.stringify({ nome, email, numero, password }),
   });
 
   const data = await response.json();
-  if (!response.ok) throw new Error(data.message || 'Erro ao realizar cadastro');
+  console.log(data);
+  if (!response.ok) throw new Error(data.mensagem || 'Erro ao realizar cadastro');
 
   return data;
 };

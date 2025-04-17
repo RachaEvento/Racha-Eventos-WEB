@@ -1,32 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { login } from '../services/autenticacaoService';
 import { useNavigate } from 'react-router-dom';
+import { MdEmail, MdVisibility, MdVisibilityOff } from 'react-icons/md'; // Import MdVisibility and MdVisibilityOff
+
+// Memoize the IconInputWrapper to prevent unnecessary re-renders
+const IconInputWrapper = React.memo(({ children, Icon, onIconClick }) => {
+  const handleIconClick = () => {
+    if (Icon === MdVisibility || Icon === MdVisibilityOff) {
+      onIconClick();
+    }
+  };
+
+  return (
+    <div className="relative">
+      {children}
+      <div
+        className="absolute inset-y-0 right-3 flex items-center text-gray-400"
+        onClick={handleIconClick}
+      >
+        <Icon size={20} />
+      </div>
+    </div>
+  );
+});
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // Use useCallback to memoize the handleChange function
+  const handleEmailChange = useCallback((e) => setEmail(e.target.value), []);
+  const handlePasswordChange = useCallback((e) => setPassword(e.target.value), []);
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.email) newErrors.email = 'E-mail é obrigatório';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'E-mail inválido';
+    if (!email) newErrors.email = 'E-mail é obrigatório';
+    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'E-mail inválido';
     
-    if (!formData.password) newErrors.password = 'Senha é obrigatória';
-    else if (formData.password.length < 6) newErrors.password = 'A senha deve ter pelo menos 6 caracteres';
+    if (!password) newErrors.password = 'Senha é obrigatória';
+    else if (password.length < 6) newErrors.password = 'A senha deve ter pelo menos 6 caracteres';
     
     return newErrors;
   };
@@ -42,7 +58,7 @@ const Login = () => {
 
     setIsLoading(true);
     try {
-      await login(formData.email, formData.password);
+      await login(email, password);
       navigate('/eventos');
     } catch (error) {
       setErrors({ form: error.message });
@@ -56,16 +72,18 @@ const Login = () => {
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
           E-mail
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          placeholder="seu@email.com"
-        />
+        </label>        
+        <IconInputWrapper Icon={MdEmail}>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={email}
+            onChange={handleEmailChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            placeholder="seu@email.com"
+          />
+        </IconInputWrapper>
         {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
       </div>
       
@@ -73,15 +91,17 @@ const Login = () => {
         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
           Senha
         </label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          placeholder="******"
-        />
+        <IconInputWrapper Icon={showPassword ? MdVisibility : MdVisibilityOff} onIconClick={() => { setShowPassword(prevState => !prevState)}}>
+          <input
+            type={showPassword ? 'text' : 'password'} // Toggle password visibility
+            id="password"
+            name="password"
+            value={password}
+            onChange={handlePasswordChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            placeholder="******"
+          />
+        </IconInputWrapper>
         {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
       </div>
       
