@@ -1,121 +1,71 @@
 import React, { useState, useEffect } from "react";
-import { MdAdd, MdPerson } from "react-icons/md";
-
-const contacts = [
-  { id: 1, name: "João Silva", email: "joao.silva@email.com", phone: "(11) 91234-5678" },
-  { id: 2, name: "Maria Oliveira", email: "maria.oliveira@email.com", phone: "(21) 99876-5432" },
-  { id: 3, name: "Carlos Santos", email: "carlos.santos@email.com", phone: "(31) 98765-4321" },
-  { id: 4, name: "Ana Pereira", email: "ana.pereira@email.com", phone: "(41) 91234-0011" },
-];
-
-function ContactCard({ name, email, phone, onClick }) {
-  return (
-    <div
-      onClick={onClick}
-      className="cursor-pointer flex flex-col items-center justify-center bg-white border border-[#3e8682] rounded-lg w-full aspect-square shadow hover:shadow-md"
-    >
-      <div className="w-1/2 h-1/2 rounded-full bg-[#55c6b1] flex items-center justify-center mb-4">
-        <MdPerson size={48} className="text-white" />
-      </div>
-      <span className="text-[#264f57] font-semibold mb-1 text-center">{name}</span>
-    </div>
-  );
-}
-
-function ContactPopup({ contact, onClose }) {
-    const [editedContact, setEditedContact] = useState(null);
-    const [editedFields, setEditedFields] = useState({});
-  
-    useEffect(() => {
-      if (contact) {
-        setEditedContact(contact);
-        setEditedFields({});
-      }
-    }, [contact]);
-  
-    if (!contact || !editedContact) return null;
-  
-    const handleChange = (field, value) => {
-      setEditedContact((prev) => ({ ...prev, [field]: value }));
-      setEditedFields((prev) => ({
-        ...prev,
-        [field]: value !== contact[field],
-      }));
-    };
-  
-    const hasChanges = Object.values(editedFields).some(Boolean);
-  
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg p-6 w-full max-w-sm text-center relative mx-4">
-          <button
-            className="absolute top-2 right-2 text-[#264f57] hover:text-[#3e8682] text-2xl font-bold"
-            onClick={onClose}
-          >
-            &times;
-          </button>
-          <div className="flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full bg-[#55c6b1] flex items-center justify-center mb-4">
-              <MdPerson size={48} className="text-white" />
-            </div>
-  
-            <input
-              type="text"
-              value={editedContact.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-              className={`text-center font-semibold text-[#264f57] mb-4 w-full p-2 rounded focus:outline-none transition-shadow duration-200 ${
-                editedFields.name
-                  ? "shadow-[inset_0_0_0_2px_#264f57]"
-                  : "shadow-none"
-              }`}
-            />
-  
-            <div className="w-full mb-2">
-              <input
-                type="text"
-                value={editedContact.phone}
-                onChange={(e) => handleChange("phone", e.target.value)}
-                className={`text-left text-[#264f57] w-full p-2 rounded focus:outline-none transition-shadow duration-200 ${
-                  editedFields.phone
-                    ? "shadow-[inset_0_0_0_2px_#264f57]"
-                    : "shadow-none"
-                }`}
-              />
-            </div>
-  
-            <div className="w-full">
-              <input
-                type="text"
-                value={editedContact.email}
-                onChange={(e) => handleChange("email", e.target.value)}
-                className={`text-left text-[#264f57] w-full p-2 rounded focus:outline-none transition-shadow duration-200 ${
-                  editedFields.email
-                    ? "shadow-[inset_0_0_0_2px_#264f57]"
-                    : "shadow-none"
-                }`}
-              />
-            </div>
-  
-            {/* Botão sempre presente, mas invisível se não houver mudanças */}
-            <div className="mt-4 ml-auto h-[42px]">
-              <button
-                className={`bg-[#264f57] hover:bg-[#3e8682] text-white px-4 py-2 rounded transition-opacity duration-200 ${
-                  hasChanges ? "opacity-100 visible" : "opacity-0 invisible"
-                }`}
-                onClick={() => console.log("Salvar alterações", editedContact)}
-                disabled={!hasChanges}
-              >
-                Salvar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-}
+import { MdAdd } from "react-icons/md";
+import { todosContatos } from '../services/contatosService';
+import { PropagateLoader } from "react-spinners";
+import ContatoCard from "../components/cards/ContatoCard";
+import ContatoPopup from "../components/popups/ContatoPopup";
 
 function Contatos() {
-  const [selectedContact, setSelectedContact] = useState(null);
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filteredContacts, setFilteredContacts] = useState([]);
+  const [selectedContact, setSelectedContact] = useState(null);  
+  const [isNew, setIsNew] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const fetchContatos = async () => {
+    setLoading(true);
+    try {
+      const data = await todosContatos();
+      setContacts(data);
+      setFilteredContacts(data);
+    } catch (error) {
+      console.error("Erro ao buscar contatos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchContatos();
+  }, []);
+
+  useEffect(() => {
+    // Mostrar o loader enquanto filtra os contatos
+    const filterContacts = () => {
+      setLoading(true);
+      const filtered = contacts.filter(contact => {
+        return (
+          contact.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          contact.telefone.includes(searchQuery)
+        );
+      });
+      setFilteredContacts(filtered);
+      setLoading(false);
+    };
+
+    if (searchQuery) {
+      filterContacts(); // Chama o filtro quando a consulta muda
+    } else {
+      setFilteredContacts(contacts); // Se a consulta estiver vazia, mostrar todos os contatos
+    }
+  }, [searchQuery, contacts]);
+
+  const openPopup = (contact = null, isNew = false) => {
+    setSelectedContact(contact);
+    setIsNew(isNew);
+    setShowPopup(true);
+  };
+
+  const closePopup = (refresh = false) => {
+    setSelectedContact(null);
+    setShowPopup(false);
+    if (refresh) {
+      fetchContatos();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white p-8 relative">
@@ -124,22 +74,30 @@ function Contatos() {
       <div className="mb-6">
         <input
           type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)} // Atualiza o estado do valor de busca
           placeholder="Pesquisar por nome, telefone, email..."
           className="w-full p-2 rounded bg-white text-[#264f57] placeholder-[#264f57] border-2 border-[#264f57] focus:outline-none focus:ring-2 focus:ring-[#55c6b1] focus:border-transparent"
         />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-7 gap-6 mb-20">
-        {contacts.map((contact) => (
-          <ContactCard
-            key={contact.id}
-            name={contact.name}
-            email={contact.email}
-            phone={contact.phone}
-            onClick={() => setSelectedContact(contact)}
-          />
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex justify-center items-center p-16">
+          <PropagateLoader color="#264f57" size={15} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-7 gap-6 mb-20">
+          {filteredContacts.map((contact) => (
+            <ContatoCard
+              key={contact.id}
+              nome={contact.nome}
+              email={contact.email}
+              telefone={contact.telefone}
+              onClick={() => openPopup(contact, false)}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="fixed bottom-6 right-6 group flex items-center gap-[15px]">
         <span className="hidden md:inline-block opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300 bg-[#3e8682] text-white px-3 py-2 rounded-md whitespace-nowrap">
@@ -147,13 +105,19 @@ function Contatos() {
         </span>
         <button
           className="bg-[#264f57] hover:bg-[#3e8682] text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg"
-          onClick={() => console.log("Adicionar novo contato")}
+          onClick={() => openPopup(null, true)}
         >
           <MdAdd size={28} />
         </button>
       </div>
 
-      <ContactPopup contact={selectedContact} onClose={() => setSelectedContact(null)} />
+      {showPopup && (
+        <ContatoPopup
+          contact={selectedContact}
+          isNew={isNew}
+          onClose={closePopup}
+        />
+      )}
     </div>
   );
 }
