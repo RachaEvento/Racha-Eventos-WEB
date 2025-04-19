@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Autenticacao from "./pages/Autenticacao";
+import Autenticacao from "./pages/autenticacao/Autenticacao";
 import Eventos from "./pages/Eventos";
 import RotaProtegida from "./auth/RotaProtegida";
 
