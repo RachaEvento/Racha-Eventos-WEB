@@ -1,38 +1,18 @@
 import React, { useState, useCallback } from 'react';
 import { login } from '../services/autenticacaoService';
 import { useNavigate } from 'react-router-dom';
-import { MdEmail, MdVisibility, MdVisibilityOff } from 'react-icons/md'; // Import MdVisibility and MdVisibilityOff
+import { MdEmail, MdVisibility, MdVisibilityOff } from 'react-icons/md';
+import IconInputWrapper from '../util/IconInputWrapper';
 
-// Memoize the IconInputWrapper to prevent unnecessary re-renders
-const IconInputWrapper = React.memo(({ children, Icon, onIconClick }) => {
-  const handleIconClick = () => {
-    if (Icon === MdVisibility || Icon === MdVisibilityOff) {
-      onIconClick();
-    }
-  };
-
-  return (
-    <div className="relative">
-      {children}
-      <div
-        className="absolute inset-y-0 right-3 flex items-center text-gray-400"
-        onClick={handleIconClick}
-      >
-        <Icon size={20} />
-      </div>
-    </div>
-  );
-});
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  // Use useCallback to memoize the handleChange function
   const handleEmailChange = useCallback((e) => setEmail(e.target.value), []);
   const handlePasswordChange = useCallback((e) => setPassword(e.target.value), []);
 
@@ -93,7 +73,7 @@ const Login = () => {
         </label>
         <IconInputWrapper Icon={showPassword ? MdVisibility : MdVisibilityOff} onIconClick={() => { setShowPassword(prevState => !prevState)}}>
           <input
-            type={showPassword ? 'text' : 'password'} // Toggle password visibility
+            type={showPassword ? 'text' : 'password'}
             id="password"
             name="password"
             value={password}
@@ -107,7 +87,7 @@ const Login = () => {
       
       <div className="flex items-center justify-between">        
         <div className="text-sm">
-          <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+          <a href="/" className="font-medium text-blue-600 hover:text-blue-500">
             Esqueceu sua senha?
           </a>
         </div>

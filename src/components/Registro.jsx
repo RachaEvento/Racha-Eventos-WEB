@@ -3,28 +3,7 @@ import { registrar } from '../services/autenticacaoService';
 import Cleave from 'cleave.js/react';
 import { MdPerson, MdEmail, MdPhone, MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import { useSnackbar } from '../util/SnackbarProvider';
-
-// Memoize the IconInputWrapper to prevent unnecessary re-renders
-const IconInputWrapper = React.memo(({ children, Icon, onIconClick }) => {
-  const handleIconClick = () => {
-    if (Icon === MdVisibility || Icon === MdVisibilityOff) {
-      onIconClick();
-    }
-  };
-
-  return (
-    <div className="relative">
-      {children}
-      <div
-        className="absolute inset-y-0 right-3 flex items-center text-gray-400"
-        onClick={handleIconClick}
-      >
-        <Icon size={20} />
-      </div>
-    </div>
-  );
-});
-
+import IconInputWrapper from '../util/IconInputWrapper';
 
 const Registro = ({ setActiveTab }) => {
   const { showSnackbar } = useSnackbar();

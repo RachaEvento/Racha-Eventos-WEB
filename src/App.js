@@ -4,6 +4,7 @@ import Autenticacao from "./pages/Autenticacao";
 import Eventos from "./pages/Eventos";
 import RotaProtegida from "./auth/RotaProtegida";
 import { SnackbarProvider } from './util/SnackbarProvider';
+import Contatos from "./pages/Contatos";
 
 function App() {
   return (
@@ -11,7 +12,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Autenticacao />} />
-        <Route path="/eventos" element={<RotaProtegida><Eventos /></RotaProtegida>} />
+        <Route path="/eventos" element={<RotaProtegida><Eventos /></RotaProtegida>} />        
+        <Route path="/contatos" element={<Contatos />} />
       </Routes>
     </Router>
     </SnackbarProvider>
