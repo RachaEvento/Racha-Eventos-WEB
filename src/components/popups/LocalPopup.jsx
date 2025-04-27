@@ -65,7 +65,7 @@ function LocalPopup({ Local, onClose, isNew }) {
       }
       onClose(true);
     } catch (err) {
-      setError('Erro ao salvar local. Tente novamente.');
+      setError(err.message || 'Erro ao salvar contato. Tente novamente.');
     } finally {
       setLoading(false);
     }

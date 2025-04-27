@@ -1,7 +1,7 @@
 const API_URL = process.env.REACT_APP_API_URL;
 
 export const requisitar = async (endpoint, options = {}) => {
-  const token = localStorage.getItem('token'); // or sessionStorage, or from a context
+  const token = localStorage.getItem('token');
 
   const headers = {
     'Content-Type': 'application/json',
@@ -14,5 +14,13 @@ export const requisitar = async (endpoint, options = {}) => {
     headers,
   };
 
-  return fetch(`${API_URL}${endpoint}`, config);
+  const response = await fetch(`${API_URL}${endpoint}`, config);
+
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    window.location.href = '/';
+    return;
+  }
+
+  return response;
 };

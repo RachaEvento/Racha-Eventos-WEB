@@ -62,7 +62,7 @@ function ContatoPopup({ contact, onClose, isNew }) {
       }
       onClose(true);
     } catch (err) {
-      setError('Erro ao salvar contato. Tente novamente.');
+      setError(err || 'Erro ao salvar contato. Tente novamente.');
     } finally {
       setLoading(false);
     }

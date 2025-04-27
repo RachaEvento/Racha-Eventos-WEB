@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { MdAdd } from "react-icons/md";
 import { todosLocais } from '../services/locaisService';
 import { PropagateLoader } from "react-spinners";
 import LocalCard from "../components/cards/LocalCard";
 import LocalPopup from "../components/popups/LocalPopup";
+import { useSnackbar } from '../util/SnackbarProvider';
 
-function Locais() {
+function Locais() {  
+  const { showSnackbar } = useSnackbar();
   const [locals, setlocals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filteredlocals, setFilteredlocals] = useState([]);
@@ -14,25 +16,24 @@ function Locais() {
   const [showPopup, setShowPopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchLocais = async () => {
+  const fetchLocais = useCallback(async () => {
     setLoading(true);
     try {
       const data = await todosLocais();
       setlocals(data);
       setFilteredlocals(data);
     } catch (error) {
-      console.error("Erro ao buscar Locais:", error);
+      showSnackbar(error.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [showSnackbar]);
 
   useEffect(() => {
     fetchLocais();
-  }, []);
+  }, [fetchLocais]);
 
   useEffect(() => {
-    // Mostrar o loader enquanto filtra os Locais
     const filterlocals = () => {
       setLoading(true);
       const filtered = locals.filter(Local => {
