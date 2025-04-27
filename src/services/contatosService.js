@@ -8,20 +8,21 @@ export const todosContatos = async () => {
 
     const response = await requisitar('/contatos');
 
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
-    }
-
     const result = await response.json();
 
     if (result.sucesso) {
       return result.dados;
     } else {
-      throw new Error(result.mensagem || 'Erro ao carregar contatos.');
+      let errorMessage = 'Erro ao recuperar os contatos.';
+      if (result.erros && Array.isArray(result.erros) && result.erros.length > 0) {
+        errorMessage = result.erros.join(', ');
+      } else if (result.mensagem) {
+        errorMessage = result.mensagem;
+      }
+      throw new Error(errorMessage);
     }
   } catch (error) {
-    console.error('Erro ao buscar contatos:', error);
-    return [];
+    throw new Error(error.message);
   }
 };
 
@@ -39,20 +40,21 @@ export const criarContato = async (nome, email, telefone, ativo = true) => {
       body: JSON.stringify(contato),
     });
 
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
-    }
-
     const result = await response.json();
 
     if (result.sucesso) {
       return result.dados;
     } else {
-      throw new Error(result.mensagem || 'Erro ao criar contato.');
+      let errorMessage = 'Erro ao criar o contato.';
+      if (result.erros && Array.isArray(result.erros) && result.erros.length > 0) {
+        errorMessage = result.erros.join(', ');
+      } else if (result.mensagem) {
+        errorMessage = result.mensagem;
+      }
+      throw new Error(errorMessage);
     }
   } catch (error) {
-    console.error('Erro ao criar contato:', error);
-    return null;
+    throw new Error(error.message);
   }
 };
 
@@ -71,20 +73,21 @@ export const editarContato = async (id, nome, email, telefone, ativo = true) => 
       method: 'PUT',
       body: JSON.stringify(contatoAtualizado),
     });
-
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
-    }
-
+    
     const result = await response.json();
 
     if (result.sucesso) {
       return result.dados;
     } else {
-      throw new Error(result.mensagem || 'Erro ao editar contato.');
+      let errorMessage = 'Erro ao editar o contato.';
+      if (result.erros && Array.isArray(result.erros) && result.erros.length > 0) {
+        errorMessage = result.erros.join(', ');
+      } else if (result.mensagem) {
+        errorMessage = result.mensagem;
+      }
+      throw new Error(errorMessage);
     }
   } catch (error) {
-    console.error('Erro ao editar contato:', error);
-    return null;
+    throw new Error(error.message);
   }
 };

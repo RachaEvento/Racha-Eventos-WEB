@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { MdAdd } from "react-icons/md";
 import { todosContatos } from '../services/contatosService';
 import { PropagateLoader } from "react-spinners";
 import ContatoCard from "../components/cards/ContatoCard";
 import ContatoPopup from "../components/popups/ContatoPopup";
+import { useSnackbar } from '../util/SnackbarProvider';
 
 function Contatos() {
+  const { showSnackbar } = useSnackbar();
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filteredContacts, setFilteredContacts] = useState([]);
@@ -14,22 +16,22 @@ function Contatos() {
   const [showPopup, setShowPopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchContatos = async () => {
+  const fetchContatos = useCallback(async () => {
     setLoading(true);
     try {
       const data = await todosContatos();
       setContacts(data);
       setFilteredContacts(data);
     } catch (error) {
-      console.error("Erro ao buscar contatos:", error);
+      showSnackbar(error.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [showSnackbar]);
 
   useEffect(() => {
     fetchContatos();
-  }, []);
+  }, [fetchContatos]);
 
   useEffect(() => {
     // Mostrar o loader enquanto filtra os contatos

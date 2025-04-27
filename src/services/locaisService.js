@@ -1,27 +1,28 @@
 import { requisitar } from '../util/requisicaoApi';
 
 export const todosLocais = async () => {
-  try {
+  try {    
     
     // Fake delay of 1 second
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const response = await requisitar('/locais');
 
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
-    }
-
     const result = await response.json();
 
     if (result.sucesso) {
       return result.dados;
     } else {
-      throw new Error(result.mensagem || 'Erro ao carregar locais.');
+      let errorMessage = 'Erro ao recuperar os locais.';
+      if (result.erros && Array.isArray(result.erros) && result.erros.length > 0) {
+        errorMessage = result.erros.join(', ');
+      } else if (result.mensagem) {
+        errorMessage = result.mensagem;
+      }
+      throw new Error(errorMessage);
     }
   } catch (error) {
-    console.error('Erro ao buscar locais:', error);
-    return [];
+    throw new Error(error.message);
   }
 };
 
@@ -42,20 +43,21 @@ export const criarLocal = async (nome, endereco, descricaoLocal, bairro, cidade,
       body: JSON.stringify(local),
     });
 
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
-    }
-
     const result = await response.json();
 
     if (result.sucesso) {
       return result.dados;
     } else {
-      throw new Error(result.mensagem || 'Erro ao criar local.');
+      let errorMessage = 'Erro ao criar o local.';
+      if (result.erros && Array.isArray(result.erros) && result.erros.length > 0) {
+        errorMessage = result.erros.join(', ');
+      } else if (result.mensagem) {
+        errorMessage = result.mensagem;
+      }
+      throw new Error(errorMessage);
     }
   } catch (error) {
-    console.error('Erro ao criar local:', error);
-    return null;
+    throw new Error(error.message);
   }
 };
 
@@ -77,20 +79,21 @@ export const editarLocal = async (id, nome, endereco, descricaoLocal, bairro, ci
       method: 'PUT',
       body: JSON.stringify(localAtualizado),
     });
-
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
-    }
-
+    
     const result = await response.json();
 
     if (result.sucesso) {
       return result.dados;
-    } else {
-      throw new Error(result.mensagem || 'Erro ao editar local.');
+    } else {      
+      let errorMessage = 'Erro ao editar o local.';
+      if (result.erros && Array.isArray(result.erros) && result.erros.length > 0) {
+        errorMessage = result.erros.join(', ');
+      } else if (result.mensagem) {
+        errorMessage = result.mensagem;
+      }
+      throw new Error(errorMessage);
     }
   } catch (error) {
-    console.error('Erro ao editar local:', error);
-    return null;
+    throw new Error(error.message);
   }
 };
