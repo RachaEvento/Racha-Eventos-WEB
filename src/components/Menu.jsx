@@ -57,6 +57,14 @@ const Menu = ({ children }) => {
                             Contatos
                         </button>
 
+                        <button
+                            onClick={() => navigate("/locais")}
+                            className="bg-white text-[#56C7B2] font-semibold py-3 rounded-xl hover:brightness-110 transition flex items-center gap-3 px-4 shadow"
+                        >
+                            <FiPhone />
+                            Locais
+                        </button>
+
                         <hr className="border-white/40 mt-2" />
 
                         <button className="text-white py-3 px-4 hover:text-gray-200 transition flex items-center gap-3">
@@ -98,6 +106,14 @@ const Menu = ({ children }) => {
                         >
                             <FiPhone />
                             Contatos
+                        </button>                        
+
+                        <button
+                            onClick={() => navigate("/locais")}
+                            className="bg-white text-[#56C7B2] font-semibold py-3 px-5 rounded-xl hover:brightness-110 transition flex items-center gap-3 shadow"
+                        >
+                            <FiPhone />
+                            Locais
                         </button>
                     </div>
                 </div>

@@ -1,82 +1,83 @@
 import React, { useState, useEffect } from "react";
 import { MdAdd } from "react-icons/md";
-import { todosContatos } from '../services/contatosService';
+import { todosLocais } from '../services/locaisService';
 import { PropagateLoader } from "react-spinners";
-import ContatoCard from "../components/cards/ContatoCard";
-import ContatoPopup from "../components/popups/ContatoPopup";
+import LocalCard from "../components/cards/LocalCard";
+import LocalPopup from "../components/popups/LocalPopup";
 
-function Contatos() {
-  const [contacts, setContacts] = useState([]);
+function Locais() {
+  const [locals, setlocals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filteredContacts, setFilteredContacts] = useState([]);
-  const [selectedContact, setSelectedContact] = useState(null);  
+  const [filteredlocals, setFilteredlocals] = useState([]);
+  const [selectedLocal, setSelectedLocal] = useState(null);  
   const [isNew, setIsNew] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchContatos = async () => {
+  const fetchLocais = async () => {
     setLoading(true);
     try {
-      const data = await todosContatos();
-      setContacts(data);
-      setFilteredContacts(data);
+      const data = await todosLocais();
+      setlocals(data);
+      setFilteredlocals(data);
     } catch (error) {
-      console.error("Erro ao buscar contatos:", error);
+      console.error("Erro ao buscar Locais:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchContatos();
+    fetchLocais();
   }, []);
 
   useEffect(() => {
-    // Mostrar o loader enquanto filtra os contatos
-    const filterContacts = () => {
+    // Mostrar o loader enquanto filtra os Locais
+    const filterlocals = () => {
       setLoading(true);
-      const filtered = contacts.filter(contact => {
+      const filtered = locals.filter(Local => {
         return (
-          contact.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          contact.telefone.includes(searchQuery)
+          Local.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          Local.endereco.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          Local.bairro.includes(searchQuery) ||
+          Local.cidade.includes(searchQuery)
         );
       });
-      setFilteredContacts(filtered);
+      setFilteredlocals(filtered);
       setLoading(false);
     };
 
     if (searchQuery) {
-      filterContacts(); // Chama o filtro quando a consulta muda
+      filterlocals(); // Chama o filtro quando a consulta muda
     } else {
-      setFilteredContacts(contacts); // Se a consulta estiver vazia, mostrar todos os contatos
+      setFilteredlocals(locals); // Se a consulta estiver vazia, mostrar todos os Locais
     }
-  }, [searchQuery, contacts]);
+  }, [searchQuery, locals]);
 
-  const openPopup = (contact = null, isNew = false) => {
-    setSelectedContact(contact);
+  const openPopup = (Local = null, isNew = false) => {
+    setSelectedLocal(Local);
     setIsNew(isNew);
     setShowPopup(true);
   };
 
   const closePopup = (refresh = false) => {
-    setSelectedContact(null);
+    setSelectedLocal(null);
     setShowPopup(false);
     if (refresh) {
-      fetchContatos();
+      fetchLocais();
     }
   };
 
   return (
     <div className="min-h-screen bg-white p-8 relative">
-      <h1 className="text-3xl font-bold text-[#264f57] mb-6">Gestão de Contatos</h1>
+      <h1 className="text-3xl font-bold text-[#264f57] mb-6">Gestão de Locais</h1>
 
       <div className="mb-6">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)} // Atualiza o estado do valor de busca
-          placeholder="Pesquisar por nome, telefone ou email"
+          placeholder="Pesquisar por nome, endereço, bairro ou cidade"
           className="w-full p-2 rounded bg-white text-[#264f57] placeholder-[#264f57] border-2 border-[#264f57] focus:outline-none focus:ring-2 focus:ring-[#55c6b1] focus:border-transparent"
         />
       </div>
@@ -85,22 +86,22 @@ function Contatos() {
         <div className="flex justify-center items-center p-16">
           <PropagateLoader color="#264f57" size={15} />
         </div>
-      ) : filteredContacts.length === 0 ? (
+      ) : filteredlocals.length === 0 ? (
         <div className="flex flex-col justify-center items-center p-8">
-          <div className="text-3xl font-bold text-[#264f57] mb-4">Você não possuí contatos!</div>
+          <div className="text-3xl font-bold text-[#264f57] mb-4">Você não possuí Locais!</div>
           <div className="text-lg text-gray-500">
             Utilize o botão abaixo para cadastrar um contato!
           </div>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-7 gap-6 mb-20">
-          {filteredContacts.map((contact) => (
-            <ContatoCard
-              key={contact.id}
-              nome={contact.nome}
-              email={contact.email}
-              telefone={contact.telefone}
-              onClick={() => openPopup(contact, false)}
+          {filteredlocals.map((Local) => (
+            <LocalCard
+              key={Local.id}
+              nome={Local.nome}
+              email={Local.email}
+              telefone={Local.telefone}
+              onClick={() => openPopup(Local, false)}
             />
           ))}
         </div>
@@ -119,8 +120,8 @@ function Contatos() {
       </div>
 
       {showPopup && (
-        <ContatoPopup
-          contact={selectedContact}
+        <LocalPopup
+          Local={selectedLocal}
           isNew={isNew}
           onClose={closePopup}
         />
@@ -129,4 +130,4 @@ function Contatos() {
   );
 }
 
-export default Contatos;
+export default Locais;
