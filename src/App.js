@@ -13,7 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Autenticacao />} />
         <Route path="/eventos" element={<RotaProtegida><Eventos /></RotaProtegida>} />        
-        <Route path="/contatos" element={<Contatos />} />
+        <Route path="/contatos" element={<RotaProtegida><Contatos /></RotaProtegida>} />
       </Routes>
     </Router>
     </SnackbarProvider>
