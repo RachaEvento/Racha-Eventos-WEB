@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Menu from "../components/Menu";
 
 function Eventos() {
   const navigate = useNavigate();
@@ -11,9 +10,7 @@ function Eventos() {
 
   return (
     <div className="bg-white min-h-screen font-inter">
-      <Menu />
-
-      <div className="p-6 md:ml-80">
+      <div className="p-6">
         {/* Cabeçalho com título e botão */}
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-4xl font-extrabold text-[#3F9184]">Meus Eventos</h1>
