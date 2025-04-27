@@ -9,7 +9,7 @@ import {
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
-const Menu = () => {
+const Menu = ({ children }) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const navigate = useNavigate();
 
@@ -42,7 +42,9 @@ const Menu = () => {
 
                         <hr className="border-white/40" />
 
-                        <button className="bg-white text-[#56C7B2] font-semibold py-3 rounded-xl hover:brightness-110 transition flex items-center gap-3 px-4 shadow">
+                        <button 
+                            onClick={() => navigate("/eventos")}
+                            className="bg-white text-[#56C7B2] font-semibold py-3 rounded-xl hover:brightness-110 transition flex items-center gap-3 px-4 shadow">
                             <FiCalendar />
                             Eventos
                         </button>
@@ -91,7 +93,9 @@ const Menu = () => {
                     </p>
 
                     <div className="flex flex-col gap-4 mt-4">
-                        <button className="bg-white text-[#56C7B2] font-semibold py-3 px-5 rounded-xl hover:brightness-110 transition flex items-center gap-3 shadow">
+                        <button 
+                            onClick={() => navigate("/eventos")}
+                            className="bg-white text-[#56C7B2] font-semibold py-3 px-5 rounded-xl hover:brightness-110 transition flex items-center gap-3 shadow">
                             <FiCalendar />
                             Eventos
                         </button>
@@ -128,6 +132,10 @@ const Menu = () => {
                         Sair
                     </button>
                 </div>
+            </div>
+
+            <div className="md:ml-72 md:mt-0 mt-12 ">
+                {children}
             </div>
         </div>
     );
