@@ -87,11 +87,18 @@ function Locais() {
         <div className="flex justify-center items-center p-16">
           <PropagateLoader color="#264f57" size={15} />
         </div>
+      ) : filteredlocals.length === 0 && searchQuery !== "" ? (
+        <div className="flex flex-col justify-center items-center p-8">
+          <div className="text-3xl font-bold text-[#264f57] mb-4">Local não encontrado!</div>
+          <div className="text-lg text-gray-500">
+            Utilize o botão abaixo para cadastrar um local.
+          </div>
+        </div>
       ) : filteredlocals.length === 0 ? (
         <div className="flex flex-col justify-center items-center p-8">
           <div className="text-3xl font-bold text-[#264f57] mb-4">Você não possuí Locais!</div>
           <div className="text-lg text-gray-500">
-            Utilize o botão abaixo para cadastrar um contato!
+            Utilize o botão abaixo para cadastrar um local.
           </div>
         </div>
       ) : (
