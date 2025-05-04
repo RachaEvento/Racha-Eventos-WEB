@@ -96,7 +96,7 @@ function Locais() {
         </div>
       ) : filteredlocals.length === 0 ? (
         <div className="flex flex-col justify-center items-center p-8">
-          <div className="text-3xl font-bold text-[#264f57] mb-4">Você não possuí Locais!</div>
+          <div className="text-3xl font-bold text-[#264f57] mb-4">Você não possui Locais!</div>
           <div className="text-lg text-gray-500">
             Utilize o botão abaixo para cadastrar um local.
           </div>

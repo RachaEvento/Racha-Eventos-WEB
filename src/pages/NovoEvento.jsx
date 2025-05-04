@@ -1,27 +1,27 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { MdAdd } from "react-icons/md";
-import { todosContatos } from '../services/contatosService';
+import { todosEventos } from '../services/eventosService';
 import { PropagateLoader } from "react-spinners";
-import ContatoCard from "../components/cards/ContatoCard";
-import ContatoPopup from "../components/popups/ContatoPopup";
+import NovoEventoCard from "../components/cards/NovoEventoCard";
+import NovoEventoPopup from "../components/popups/NovoEventoPopup";
 import { useSnackbar } from '../util/SnackbarProvider';
 
-function Contatos() {
+function NovoEvento() {
   const { showSnackbar } = useSnackbar();
-  const [contacts, setContacts] = useState([]);
+  const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filteredContacts, setFilteredContacts] = useState([]);
-  const [selectedContact, setSelectedContact] = useState(null);  
+  const [filteredEventos, setFilteredEventos] = useState([]);
+  const [selectedEvento, setSelectedEvento] = useState(null);  
   const [isNew, setIsNew] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchContatos = useCallback(async () => {
+  const fetchEventos = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await todosContatos();
-      setContacts(data);
-      setFilteredContacts(data);
+      const data = await todosEventos();
+      setEventos(data);
+      setFilteredEventos(data);
     } catch (error) {
       showSnackbar(error.message);
     } finally {
@@ -30,53 +30,53 @@ function Contatos() {
   }, [showSnackbar]);
 
   useEffect(() => {
-    fetchContatos();
-  }, [fetchContatos]);
+    fetchEventos();
+  }, [fetchEventos]);
 
   useEffect(() => {
-    const filterContacts = () => {
+    const filterEventos = () => {
       setLoading(true);
-      const filtered = contacts.filter(contact => {
+      const filtered = eventos.filter(evento => {
         return (
-          contact.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          contact.telefone.includes(searchQuery)
+          evento.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          evento.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          evento.telefone.includes(searchQuery)
         );
       });
-      setFilteredContacts(filtered);
+      setFilteredEventos(filtered);
       setLoading(false);
     };
 
     if (searchQuery) {
-      filterContacts(); // Chama o filtro quando a consulta muda
+      filterEventos();
     } else {
-      setFilteredContacts(contacts); // Se a consulta estiver vazia, mostrar todos os contatos
+      setFilteredEventos(eventos);
     }
-  }, [searchQuery, contacts]);
+  }, [searchQuery, eventos]);
 
-  const openPopup = (contact = null, isNew = false) => {
-    setSelectedContact(contact);
+  const openPopup = (evento = null, isNew = false) => {
+    setSelectedEvento(evento);
     setIsNew(isNew);
     setShowPopup(true);
   };
 
   const closePopup = (refresh = false) => {
-    setSelectedContact(null);
+    setSelectedEvento(null);
     setShowPopup(false);
     if (refresh) {
-      fetchContatos();
+      fetchEventos();
     }
   };
 
   return (
     <div className="min-h-screen bg-white p-8 relative">
-      <h1 className="text-3xl font-bold text-[#264f57] mb-6">Gestão de Contatos</h1>
+      <h1 className="text-3xl font-bold text-[#264f57] mb-6">Gestão de Eventos</h1>
 
       <div className="mb-6">
         <input
           type="text"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)} // Atualiza o estado do valor de busca
+          onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Pesquisar por nome, telefone ou email"
           className="w-full p-2 rounded bg-white text-[#264f57] placeholder-[#264f57] border-2 border-[#264f57] focus:outline-none focus:ring-2 focus:ring-[#55c6b1] focus:border-transparent"
         />
@@ -86,29 +86,29 @@ function Contatos() {
         <div className="flex justify-center items-center p-16">
           <PropagateLoader color="#264f57" size={15} />
         </div>
-      ) : filteredContacts.length === 0 && searchQuery !== "" ? (
+      ) : filteredEventos.length === 0 && searchQuery !== "" ? (
         <div className="flex flex-col justify-center items-center p-8">
-          <div className="text-3xl font-bold text-[#264f57] mb-4">Contato não encontrado!</div>
+          <div className="text-3xl font-bold text-[#264f57] mb-4">Evento não encontrado!</div>
           <div className="text-lg text-gray-500">
-            Utilize o botão abaixo para cadastrar um contato.
+            Utilize o botão abaixo para cadastrar um evento.
           </div>
         </div>
-      ) : filteredContacts.length === 0 ? (
+      ) : filteredEventos.length === 0 ? (
         <div className="flex flex-col justify-center items-center p-8">
-          <div className="text-3xl font-bold text-[#264f57] mb-4">Você não possui contatos!</div>
+          <div className="text-3xl font-bold text-[#264f57] mb-4">Você não possui eventos!</div>
           <div className="text-lg text-gray-500">
-            Utilize o botão abaixo para cadastrar um contato.
+            Utilize o botão abaixo para cadastrar um evento.
           </div>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-7 gap-6 mb-20">
-          {filteredContacts.map((contact) => (
-            <ContatoCard
-              key={contact.id}
-              nome={contact.nome}
-              email={contact.email}
-              telefone={contact.telefone}
-              onClick={() => openPopup(contact, false)}
+          {filteredEventos.map((evento) => (
+            <NovoEventoCard
+              key={evento.id}
+              nome={evento.nome}
+              email={evento.email}
+              telefone={evento.telefone}
+              onClick={() => openPopup(evento, false)}
             />
           ))}
         </div>
@@ -116,7 +116,7 @@ function Contatos() {
 
       <div className="fixed bottom-6 right-6 group flex items-center gap-[15px]">
         <span className="hidden md:inline-block opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300 bg-[#3e8682] text-white px-3 py-2 rounded-md whitespace-nowrap">
-          Adicionar contato
+          Adicionar evento
         </span>
         <button
           className="bg-[#264f57] hover:bg-[#3e8682] text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg"
@@ -127,8 +127,8 @@ function Contatos() {
       </div>
 
       {showPopup && (
-        <ContatoPopup
-          contact={selectedContact}
+        <NovoEventoPopup
+          evento={selectedEvento}
           isNew={isNew}
           onClose={closePopup}
         />
@@ -137,4 +137,4 @@ function Contatos() {
   );
 }
 
-export default Contatos;
+export default NovoEvento;
