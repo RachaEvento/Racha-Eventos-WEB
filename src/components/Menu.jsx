@@ -6,6 +6,7 @@ import {
     FiPhone,
     FiSettings,
     FiLogOut,
+    FiMapPin, // Ícone correto para Locais
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
@@ -61,13 +62,15 @@ const Menu = ({ children }) => {
                             onClick={() => navigate("/locais")}
                             className="bg-white text-[#56C7B2] font-semibold py-3 rounded-xl hover:brightness-110 transition flex items-center gap-3 px-4 shadow"
                         >
-                            <FiPhone />
+                            <FiMapPin />
                             Locais
                         </button>
 
                         <hr className="border-white/40 mt-2" />
 
-                        <button className="text-white py-3 px-4 hover:text-gray-200 transition flex items-center gap-3">
+                        <button
+                            onClick={() => navigate("/configuracoes")}
+                            className="text-white py-3 px-4 hover:text-gray-200 transition flex items-center gap-3">
                             <FiSettings />
                             Configurações
                         </button>
@@ -112,13 +115,14 @@ const Menu = ({ children }) => {
                             onClick={() => navigate("/locais")}
                             className="bg-white text-[#56C7B2] font-semibold py-3 px-5 rounded-xl hover:brightness-110 transition flex items-center gap-3 shadow"
                         >
-                            <FiPhone />
+                            <FiMapPin />
                             Locais
                         </button>
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-3">
+                <div onClick={() => navigate("/configuracoes")}
+                     className="flex flex-col gap-3">
                     <button className="text-white py-3 px-5 hover:text-gray-200 transition flex items-center gap-3">
                         <FiSettings />
                         Configurações
