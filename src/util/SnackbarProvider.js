@@ -22,7 +22,7 @@ export const SnackbarProvider = ({ children }) => {
     <SnackbarContext.Provider value={{ showSnackbar }}>
       {children}
       {snackbar.open && (
-        <div style={styles.snackbar}>
+        <div data-testid="mensagem-snackbar" style={styles.snackbar}>
           {snackbar.message}
         </div>
       )}
