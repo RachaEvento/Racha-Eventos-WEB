@@ -29,7 +29,7 @@ export const criarEvento = async ({
   nome,
   descricao,
   dataInicio,
-  dataFinal,
+  dataFim, 
   status,
   localId,
   contatosParticipantes = []
@@ -39,7 +39,7 @@ export const criarEvento = async ({
       nome,
       descricao,
       dataInicio,
-      dataFinal,
+      dataFinal: dataFim, 
       status,
       localId,
       contatosParticipantes
@@ -68,13 +68,13 @@ export const criarEvento = async ({
   }
 };
 
-// Editar evento existente
+
 export const editarEvento = async ({
   id,
   nome,
   descricao,
   dataInicio,
-  dataFinal,
+  dataFim,
   status,
   localId,
   contatosParticipantes = []
@@ -85,7 +85,7 @@ export const editarEvento = async ({
       nome,
       descricao,
       dataInicio,
-      dataFinal,
+      dataFinal: dataFim, 
       status,
       localId,
       contatosParticipantes

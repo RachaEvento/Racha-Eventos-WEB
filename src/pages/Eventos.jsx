@@ -6,6 +6,40 @@ function Eventos() {
   const [filtro, setFiltro] = useState("");
   const navigate = useNavigate(); // Hook para navegação
 
+  // Simulando eventos
+  useEffect(() => {
+    setEventos([
+      {
+        id: 1,
+        nome: "Festa de Aniversário",
+        descricao: "Uma festa divertida para comemorar o aniversário de João!",
+        dataFinal: "2025-05-10T18:00:00",
+        status: 0,
+      },
+      {
+        id: 2,
+        nome: "Reunião de Trabalho",
+        descricao: "Discussão sobre o progresso do projeto com toda a equipe.",
+        dataFinal: "2025-05-12T14:00:00",
+        status: 1,
+      },
+      {
+        id: 3,
+        nome: "Show de Música ao Vivo",
+        descricao: "Apresentação de bandas locais e artistas convidados.",
+        dataFinal: "2025-05-15T20:00:00",
+        status: 0,
+      },
+      {
+        id: 4,
+        nome: "Workshop de Tecnologia",
+        descricao: "Um workshop sobre as últimas tendências em tecnologia.",
+        dataFinal: "2025-05-20T09:00:00",
+        status: 1,
+      },
+    ]);
+  }, []);
+
   const eventosFiltrados = eventos.filter((evento) =>
     evento.nome?.toLowerCase().includes(filtro.toLowerCase())
   );
@@ -31,8 +65,9 @@ function Eventos() {
             placeholder="Filtros..."
             value={filtro}
             onChange={(e) => setFiltro(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#3F9184]"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#3F9184] text-gray-800"  // Aqui é onde a cor da fonte foi alterada
           />
+
         </div>
 
         {/* Cards de eventos */}
