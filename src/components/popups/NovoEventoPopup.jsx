@@ -3,6 +3,8 @@ import { MdEvent, MdLocationOn, MdDescription } from "react-icons/md";
 import { requisitar } from "../../util/requisicaoApi";
 import { todosLocais } from "../../services/locaisService";
 import { useSnackbar } from "../../util/SnackbarProvider";
+import { criarEvento, editarEvento } from '../../services/eventosService';
+
 
 function NovoEventoPopup({ evento, onClose, isNew }) {
   const { showSnackbar } = useSnackbar();
@@ -61,44 +63,50 @@ function NovoEventoPopup({ evento, onClose, isNew }) {
   const handleSave = async () => {
     setLoading(true);
     setError("");
-
+  
     if (!editedEvento.nome.trim()) {
       setError("O nome do evento é obrigatório.");
       setLoading(false);
       return;
     }
-
+  
     if (!editedEvento.descricao.trim()) {
       setError("A descrição do evento é obrigatória.");
       setLoading(false);
       return;
     }
-
+  
     if (!editedEvento.dataInicio || !editedEvento.dataFinal) {
       setError("As datas de início e fim são obrigatórias.");
       setLoading(false);
       return;
     }
-
+  
     if (!selectedLocal) {
       setError("O local do evento é obrigatório.");
       setLoading(false);
       return;
     }
-
+  
     try {
-      const eventoData = {
-        ...editedEvento,
+      const eventoPayload = {
+        nome: editedEvento.nome,
+        descricao: editedEvento.descricao,
+        dataInicio: editedEvento.dataInicio,
+        dataFim: editedEvento.dataFinal, 
+        status: editedEvento.status,
         localId: selectedLocal.id,
+        contatosParticipantes: [] 
       };
-
+  
       if (isNew) {
-        await requisitar("/eventos", "POST", eventoData);
+        await criarEvento(eventoPayload);
         showSnackbar("Evento criado com sucesso!");
       } else {
-        await requisitar(`/eventos/${evento.id}`, "PUT", eventoData);
+        await editarEvento({ ...eventoPayload, id: evento.id });
         showSnackbar("Evento atualizado com sucesso!");
       }
+  
       onClose(true);
     } catch (err) {
       setError(err.message || "Erro ao salvar evento. Tente novamente.");
@@ -106,6 +114,7 @@ function NovoEventoPopup({ evento, onClose, isNew }) {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

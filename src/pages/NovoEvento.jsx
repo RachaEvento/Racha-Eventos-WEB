@@ -102,14 +102,20 @@ function NovoEvento() {
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-7 gap-6 mb-20">
-          {filteredEventos.map((evento) => (
+           {filteredEventos.map((evento) => (
             <NovoEventoCard
               key={evento.id}
               nome={evento.nome}
-              email={evento.email}
-              telefone={evento.telefone}
+              local={evento.local?.nome || "Sem local"}
+              data={new Date(evento.dataInicio).toLocaleString("pt-BR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+              })}
               onClick={() => openPopup(evento, false)}
-            />
+            />      
           ))}
         </div>
       )}
