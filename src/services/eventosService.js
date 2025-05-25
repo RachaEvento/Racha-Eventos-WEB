@@ -38,8 +38,8 @@ export const criarEvento = async ({
     const evento = {
       nome,
       descricao,
-      dataInicio,
-      dataFinal: dataFim, 
+      dataInicio: new Date(dataInicio).toISOString(),  // ✅ Garante UTC
+      dataFinal: new Date(dataFim).toISOString(),      // ✅ Garante UTC
       status,
       localId,
       contatosParticipantes
