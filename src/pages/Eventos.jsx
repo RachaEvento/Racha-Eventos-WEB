@@ -1,100 +1,140 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Importa o hook de navegação
+import React, { useState, useEffect, useCallback } from "react";
+import { MdAdd } from "react-icons/md";
+import { todosEventos } from '../services/eventosService';
+import { PropagateLoader } from "react-spinners";
+import EventoCard from "../components/cards/EventoCard";
+import NovoEventoPopup from "../components/popups/NovoEventoPopup";
+import { useSnackbar } from '../util/SnackbarProvider';
+import { useNavigate } from "react-router-dom";
 
 function Eventos() {
+  const { showSnackbar } = useSnackbar();
   const [eventos, setEventos] = useState([]);
-  const [filtro, setFiltro] = useState("");
-  const navigate = useNavigate(); // Hook para navegação
+  const [loading, setLoading] = useState(true);
+  const [filteredEventos, setFilteredEventos] = useState([]);
+  const [selectedEvento, setSelectedEvento] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");  
+  const navigate = useNavigate();
 
-  // Simulando eventos
+  const fetchEventos = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await todosEventos();
+      setEventos(data);
+      setFilteredEventos(data);
+    } catch (error) {
+      showSnackbar(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [showSnackbar]);
+
   useEffect(() => {
-    setEventos([
-      {
-        id: 1,
-        nome: "Festa de Aniversário",
-        descricao: "Uma festa divertida para comemorar o aniversário de João!",
-        dataFinal: "2025-05-10T18:00:00",
-        status: 0,
-      },
-      {
-        id: 2,
-        nome: "Reunião de Trabalho",
-        descricao: "Discussão sobre o progresso do projeto com toda a equipe.",
-        dataFinal: "2025-05-12T14:00:00",
-        status: 1,
-      },
-      {
-        id: 3,
-        nome: "Show de Música ao Vivo",
-        descricao: "Apresentação de bandas locais e artistas convidados.",
-        dataFinal: "2025-05-15T20:00:00",
-        status: 0,
-      },
-      {
-        id: 4,
-        nome: "Workshop de Tecnologia",
-        descricao: "Um workshop sobre as últimas tendências em tecnologia.",
-        dataFinal: "2025-05-20T09:00:00",
-        status: 1,
-      },
-    ]);
-  }, []);
+    fetchEventos();
+  }, [fetchEventos]);
 
-  const eventosFiltrados = eventos.filter((evento) =>
-    evento.nome?.toLowerCase().includes(filtro.toLowerCase())
-  );
+  useEffect(() => {
+    const filterEventos = () => {
+      setLoading(true);
+      const filtered = eventos.filter(evento => {
+        return (
+          evento.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          evento.descricao.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      });
+      setFilteredEventos(filtered);
+      setLoading(false);
+    };
+
+    if (searchQuery) {
+      filterEventos();
+    } else {
+      setFilteredEventos(eventos);
+    }
+  }, [searchQuery, eventos]);
+
+  const openPopup = (evento = null) => {
+    setSelectedEvento(evento);
+    setShowPopup(true);
+  };
+
+  const closePopup = (refresh = false) => {
+    setSelectedEvento(null);
+    setShowPopup(false);
+    if (refresh) {
+      fetchEventos();
+    }
+  };
+
+  const paginaEvento = (evento = null) => {
+    if (evento && evento.id) {
+      navigate(`/eventos/${evento.id}`);
+    }
+  }
 
   return (
-    <div className="bg-white min-h-screen font-inter">
-      <div className="p-6">
-        {/* Cabeçalho com título e botão */}
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-4xl font-extrabold text-[#3F9184]">Meus Eventos</h1>
-          <button
-            onClick={() => navigate("/novo-evento")}
-            className="border border-[#3F9184] text-[#3F9184] px-5 py-2 rounded-full hover:bg-[#3F9184] hover:text-white transition"
-          >
-            Novo Evento
-          </button>
+    <div className="min-h-screen bg-white p-8 relative">
+      <h1 className="text-3xl font-bold text-[#264f57] mb-6">Meus Eventos</h1>
+
+      <div className="mb-6">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Pesquisar por nome ou descrição"
+          className="w-full p-2 rounded bg-white text-[#264f57] placeholder-[#264f57] border-2 border-[#264f57] focus:outline-none focus:ring-2 focus:ring-[#55c6b1] focus:border-transparent"
+        />
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center items-center p-16">
+          <PropagateLoader color="#264f57" size={15} />
         </div>
-
-        {/* Filtros */}
-        <div className="bg-gray-200 p-4 rounded-xl mb-6">
-          <input
-            type="text"
-            placeholder="Filtros..."
-            value={filtro}
-            onChange={(e) => setFiltro(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#3F9184] text-gray-800"  // Aqui é onde a cor da fonte foi alterada
-          />
-
+      ) : (filteredEventos.length === 0 && searchQuery !== "") ? (
+        <div className="flex flex-col justify-center items-center p-8">
+          <div className="text-3xl font-bold text-[#264f57] mb-4">Evento não encontrado!</div>
+          <div className="text-lg text-gray-500">
+            Utilize o botão abaixo para cadastrar um evento.
+          </div>
         </div>
-
-        {/* Cards de eventos */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {eventosFiltrados.map((evento) => (
-            <div key={evento.id} className="bg-gray-100 rounded-xl overflow-hidden shadow-md">
-              <div className="h-40 bg-gray-300" />
-              <div className="p-4">
-                <h2 className="font-semibold text-lg text-gray-800">{evento.nome}</h2>
-                <p className="text-sm text-gray-600 mb-2">{evento.descricao}</p>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-sm text-gray-600">
-                    {new Date(evento.dataFinal).toLocaleDateString()}{" "}
-                    {new Date(evento.dataFinal).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                  <span className="bg-[#3F9184] text-white px-4 py-1 rounded-full text-sm font-medium">
-                    {evento.status === 0 ? "Pendente" : "Finalizado"}
-                  </span>
-                </div>
-              </div>
-            </div>
+      ) : (filteredEventos.length === 0) ? (
+        <div className="flex flex-col justify-center items-center p-8">
+          <div className="text-3xl font-bold text-[#264f57] mb-4">Você não possui eventos!</div>
+          <div className="text-lg text-gray-500">
+            Utilize o botão abaixo para cadastrar um evento.
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+           {filteredEventos.map((evento) => (
+            <EventoCard
+              key={evento.id}
+              evento={evento}
+              onClick={() => paginaEvento(evento)}
+            />      
           ))}
         </div>
+      )}
+
+      <div className="fixed bottom-6 right-6 group flex items-center gap-[15px]">
+        <span className="hidden md:inline-block opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300 bg-[#3e8682] text-white px-3 py-2 rounded-md whitespace-nowrap">
+          Adicionar evento
+        </span>
+        <button
+          className="bg-[#264f57] hover:bg-[#3e8682] text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg"
+          onClick={() => openPopup(null, true)}
+        >
+          <MdAdd size={28} />
+        </button>
       </div>
+
+      {showPopup && (
+        <NovoEventoPopup
+          evento={selectedEvento}
+          onClose={closePopup}
+        />
+      )}
     </div>
   );
 }
