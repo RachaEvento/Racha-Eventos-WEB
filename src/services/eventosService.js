@@ -24,6 +24,30 @@ export const todosEventos = async () => {
   }
 };
 
+// Buscar evento por ID
+export const buscarEvento = async (id) => {
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const response = await requisitar(`/eventos/${id}`);
+    const result = await response.json();
+
+    if (result.sucesso) {
+      return result.dados;
+    } else {
+      let errorMessage = 'Erro ao recuperar os eventos.';
+      if (Array.isArray(result.erros) && result.erros.length > 0) {
+        errorMessage = result.erros.join(', ');
+      } else if (result.mensagem) {
+        errorMessage = result.mensagem;
+      }
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 // Criar novo evento
 export const criarEvento = async ({
   nome,

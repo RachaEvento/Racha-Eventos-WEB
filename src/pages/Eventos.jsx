@@ -5,16 +5,17 @@ import { PropagateLoader } from "react-spinners";
 import EventoCard from "../components/cards/EventoCard";
 import NovoEventoPopup from "../components/popups/NovoEventoPopup";
 import { useSnackbar } from '../util/SnackbarProvider';
+import { useNavigate } from "react-router-dom";
 
 function Eventos() {
   const { showSnackbar } = useSnackbar();
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filteredEventos, setFilteredEventos] = useState([]);
-  const [selectedEvento, setSelectedEvento] = useState(null);  
-  const [isNew, setIsNew] = useState(false);
+  const [selectedEvento, setSelectedEvento] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");  
+  const navigate = useNavigate();
 
   const fetchEventos = useCallback(async () => {
     setLoading(true);
@@ -53,9 +54,8 @@ function Eventos() {
     }
   }, [searchQuery, eventos]);
 
-  const openPopup = (evento = null, isNew = false) => {
+  const openPopup = (evento = null) => {
     setSelectedEvento(evento);
-    setIsNew(isNew);
     setShowPopup(true);
   };
 
@@ -67,9 +67,15 @@ function Eventos() {
     }
   };
 
+  const paginaEvento = (evento = null) => {
+    if (evento && evento.id) {
+      navigate(`/eventos/${evento.id}`);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white p-8 relative">
-      <h1 className="text-3xl font-bold text-[#264f57] mb-6">Gestão de Eventos</h1>
+      <h1 className="text-3xl font-bold text-[#264f57] mb-6">Meus Eventos</h1>
 
       <div className="mb-6">
         <input
@@ -105,7 +111,7 @@ function Eventos() {
             <EventoCard
               key={evento.id}
               evento={evento}
-              onClick={() => openPopup(evento, false)}
+              onClick={() => paginaEvento(evento)}
             />      
           ))}
         </div>
@@ -126,7 +132,6 @@ function Eventos() {
       {showPopup && (
         <NovoEventoPopup
           evento={selectedEvento}
-          isNew={isNew}
           onClose={closePopup}
         />
       )}
