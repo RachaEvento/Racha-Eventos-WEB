@@ -132,7 +132,7 @@ const Convite = () => {
           <h2 className="text-3xl text-center text-[#55C6B1] font-semibold mt-2">
             {evento.nome}
           </h2>
-          <h4 className="text-xs text-gray-500 mt-1">
+          <h4 className="text-xs text-center text-gray-500 mt-1">
             {isFullDay(evento.dataInicio, evento.dataFinal) ? (
             <>Em <strong>{formatSimpleDate(evento.dataInicio)}</strong></>
             ) : (
@@ -144,6 +144,14 @@ const Convite = () => {
           </h4>
 
           <div className="mt-6 space-y-4">
+            {/* Evento */}
+            <div className="border border-[#55C6B1] rounded-xl p-4 bg-[#f9f9f9]">
+              <h3 className="text-xl font-semibold text-[#55C6B1] mb-2">
+                Detalhes do Evento
+              </h3>
+              <p>{evento.descricao}</p>
+            </div>        
+            
             {/* Local */}
             {evento.localNome && (
               <div className="bg-[#55c6b1] text-white rounded-lg p-4 flex flex-col-3 w-full">
@@ -166,14 +174,6 @@ const Convite = () => {
                 <MdPlace size={32} className="text-white" />
               </div>
             )}
-
-            {/* Evento */}
-            <div className="border border-[#55C6B1] rounded-xl p-4 bg-[#f9f9f9]">
-              <h3 className="text-xl font-semibold text-[#55C6B1] mb-2">
-                Detalhes do Evento
-              </h3>
-              <p>{evento.descricao}</p>
-            </div>        
 
           </div>
 
