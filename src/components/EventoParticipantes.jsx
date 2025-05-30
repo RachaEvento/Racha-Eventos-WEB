@@ -1,10 +1,13 @@
 import React from 'react';
+import TabelaParticipantes from './TabelaParticipantes';
 
 const EventoParticipantes = ({ evento }) => {
   
   return (
-    <div>
-        Participantes
+    <div className="">
+      <div className="">
+        <TabelaParticipantes eventoId={evento.id} />
+      </div>
     </div>
   );
 };

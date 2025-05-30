@@ -5,7 +5,7 @@ import { requisitar } from '../util/requisicaoApi';
  */
 export const listarParticipantes = async (eventoId) => {
   try {
-    const response = await requisitar(`/evento/${eventoId}`, {
+    const response = await requisitar(`/participantes/evento/${eventoId}`, {
       method: 'GET',
     });
 
@@ -32,7 +32,7 @@ export const adicionarParticipantes = async (eventoId, contatoIds) => {
       contatoIds: contatoIds, // <-- alinhado com AdicionarParticipanteDTO
     };
 
-    const response = await requisitar(`/evento/${eventoId}/adicionar`, {
+    const response = await requisitar(`/participantes/evento/${eventoId}/adicionar`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ export const removerParticipantes = async (eventoId, participantesIds) => {
       participantesIds: participantesIds, // <-- alinhado com RemoverParticipanteDTO
     };
 
-    const response = await requisitar(`/evento/${eventoId}/remover`, {
+    const response = await requisitar(`/participantes/evento/${eventoId}/remover`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
