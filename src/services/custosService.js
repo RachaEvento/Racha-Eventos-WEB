@@ -2,7 +2,7 @@ import { requisitar } from '../util/requisicaoApi';
 
 export const listarCustos = async (listaCustoId) => {
   try {
-    const response = await requisitar(`/listacusto/${listaCustoId}`);
+    const response = await requisitar(`/custo/listacusto/${listaCustoId}`);
 
     const result = await response.json();
 
@@ -24,7 +24,7 @@ export const listarCustos = async (listaCustoId) => {
 
 export const adicionarCusto = async (listaCustoId, custo) => {
   try {
-    const response = await requisitar(`/listacusto/${listaCustoId}/adicionar`, {
+    const response = await requisitar(`/custo/listacusto/${listaCustoId}/adicionar`, {
       method: 'POST',
       body: JSON.stringify(custo),
     });
@@ -49,9 +49,9 @@ export const adicionarCusto = async (listaCustoId, custo) => {
 
 export const removerCusto = async (listaCustoId, custoId) => {
   try {
-    const payload = { id: custoId };
+    const payload = { custoId: custoId };
 
-    const response = await requisitar(`/listacusto/${listaCustoId}/remover`, {
+    const response = await requisitar(`/custo/listacusto/${listaCustoId}/remover`, {
       method: 'POST',
       body: JSON.stringify(payload),
     });

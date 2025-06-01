@@ -271,22 +271,24 @@ const EventoParticipantes = ({ evento }) => {
 
   return (
     <div className="overflow-hidden">
-      <div className="flex justify-end gap-5">
-        <button
-          onClick={() => convidarParticipantesPendentes()}
-          className="flex gap-2 text-sm p-2 rounded-md bg-[#55C6B1] text-white hover:text-[#55C6B1] hover:bg-[#c9fff4] transition-colors duration-150"
-        >
-          <MdSend size={20} />
-          Enviar Convites Pendentes
-        </button>
-        <button
-          onClick={() => openPopupAdicionarContato()}
-          className="flex gap-2 text-sm p-2 rounded-md bg-[#264F57] text-white hover:text-[#55C6B1] hover:bg-[#c9fff4] transition-colors duration-150"
-        >
-          <MdContactMail size={20} />
-          Convidar Contatos
-        </button>
-      </div>
+      {evento.status === 0 && (
+        <div className="flex justify-end gap-5">
+          <button
+            onClick={() => convidarParticipantesPendentes()}
+            className="flex gap-2 text-sm p-2 rounded-md bg-[#55C6B1] text-white hover:text-[#55C6B1] hover:bg-[#c9fff4] transition-colors duration-150"
+          >
+            <MdSend size={20} />
+            Enviar Convites Pendentes
+          </button>
+          <button
+            onClick={() => openPopupAdicionarContato()}
+            className="flex gap-2 text-sm p-2 rounded-md bg-[#264F57] text-white hover:text-[#55C6B1] hover:bg-[#c9fff4] transition-colors duration-150"
+          >
+            <MdContactMail size={20} />
+            Convidar Contatos
+          </button>
+        </div>
+      )}
 
       <div className="py-4">
         <div className="relative">
