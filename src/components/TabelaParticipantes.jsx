@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { listarParticipantes } from '../services/participanteService'; // Certifique-se que o caminho está correto
-import { convidarParticipante, confirmarParticipacao, recusarParticipacao, convidarTodosParticipantes } from '../services/conviteService';
+import { convidarParticipante, confirmarParticipacao, recusarParticipacao } from '../services/conviteService';
 import { useSnackbar } from '../util/SnackbarProvider';
+
 // Importando os ícones do react-md-icons
-import { MdMail, MdAttachMoney, MdSearch, MdCheckCircle, MdSend, MdContactMail } from 'react-icons/md';
+import { MdMail, MdAttachMoney, MdSearch, MdCheckCircle } from 'react-icons/md';
 import { IoMdCloseCircle } from "react-icons/io";
 
 // Importando o react-confirm-alert
@@ -12,51 +13,47 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Estilo padrão do p
 
 // --- ADDED IMPORT FOR CLIPLOADER ---
 import { ClipLoader } from 'react-spinners';
-import ConvidarContatoPopup from './popups/ConvidarContatoPopup';
-import PagamentoParticipantePopup from './popups/PagamentoParticipantePopup';
 
-const EventoParticipantes = ({ evento }) => {
+const TabelaParticipantes = ({ eventoId }) => {
   const { showSnackbar } = useSnackbar();
   const [participantes, setParticipantes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filtro, setFiltro] = useState('');  
-  const [showPopup, setShowPopup] = useState(false);
-  const [showPagamentoParticipantePopup, setShowPagamentoParticipantePopup] = useState(false);
-  const [selectedParticipante, setSelectedParticipante] = useState(null);
+  const [filtro, setFiltro] = useState('');
 
-  const fetchParticipantes = useCallback(async () => {
-    if (!evento.id) {
+  useEffect(() => {
+    if (!eventoId) {
       setLoading(false);
       setParticipantes([]);
       setError("ID do evento não fornecido.");
       return;
     }
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await listarParticipantes(evento.id);
-      setParticipantes(data);
-    } catch (err) {
-      console.error("Erro ao buscar participantes:", err);
-      setError("Não foi possível carregar os participantes. Tente novamente mais tarde.");
-    } finally {
-      setLoading(false);
-    }
-  }, [evento.id]);
 
-  useEffect(() => {
+    const fetchParticipantes = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await listarParticipantes(eventoId);
+        setParticipantes(data);
+      } catch (err) {
+        console.error("Erro ao buscar participantes:", err);
+        setError("Não foi possível carregar os participantes. Tente novamente mais tarde.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchParticipantes();
-  }, [fetchParticipantes]);
+  }, [eventoId]);
 
   const handleVerPagamento = (participante) => {
-    setSelectedParticipante(participante);
-    setShowPagamentoParticipantePopup(true);
+    console.log(`Ver pagamento do participante: ${participante.id} (${participante.nome})`);
+    alert(`Ação: Ver pagamento do participante ${participante.nome}. Implementação pendente.`);
   };
 
-  const handleConvidar = (participante) => {
+  const handleConvidar = (eventoId, participante) => {
     const linkConvite = `${window.location.protocol}//${window.location.host}/convite/${participante.id}`;
-    console.log(participante);
+
     if (participante.email?.trim() !== '') {
       confirmAlert({
         message: (
@@ -76,7 +73,7 @@ const EventoParticipantes = ({ evento }) => {
             onClick: async () => {
               try {
                 setLoading(true);
-                await convidarParticipante(evento.id, participante.id);
+                await convidarParticipante(eventoId, participante.id);
                 confirmAlert({
                   title: 'Convite Enviado!',
                   message: `O convite foi enviado com sucesso para ${participante.nome} (${participante.email}).`,
@@ -183,60 +180,6 @@ const EventoParticipantes = ({ evento }) => {
     }
   };
 
-  const convidarParticipantesPendentes = () => {
-      confirmAlert({
-        message: (
-          <>
-            <p>
-              Você está prestes a enviar um convite para todos os participantes pendentes.
-            </p>
-          </>
-        ),
-        buttons: [
-          {
-            label: 'Enviar',
-            onClick: async () => {
-              try {
-                setLoading(true);
-                await convidarTodosParticipantes(evento.id);
-                showSnackbar('Convites Enviados!');
-                setLoading(false);
-              } catch (inviteErr) {
-                setLoading(false);
-                confirmAlert({
-                  message: `Não foi possível enviar os convites. Detalhes: ${inviteErr.message || 'Erro desconhecido'}`,
-                  buttons: [{ label: 'Ok' }]
-                });
-              }
-            }
-          },
-          {
-            label: 'Cancelar'
-          }
-        ]
-      });
-  };
-
-  const openPopupAdicionarContato = () => {
-    setShowPopup(true);
-  }
-
-  const closePopupAdicionarContato = (refresh = false) => {
-    setShowPopup(false);
-    if (refresh) {
-      fetchParticipantes();
-    }
-  };
-
-  const closePagamentoParticipantePopup = (refresh = false) => {
-    setShowPagamentoParticipantePopup(false);
-    if (refresh) {
-      fetchParticipantes();
-    }
-  };
-
-  
-
   const participantesFiltrados = participantes.filter(participante => {
     const termoBusca = filtro.toLowerCase();
     return (
@@ -271,23 +214,6 @@ const EventoParticipantes = ({ evento }) => {
 
   return (
     <div className="overflow-hidden">
-      <div className="flex justify-end gap-5">
-        <button
-          onClick={() => convidarParticipantesPendentes()}
-          className="flex gap-2 text-sm p-2 rounded-md bg-[#55C6B1] text-white hover:text-[#55C6B1] hover:bg-[#c9fff4] transition-colors duration-150"
-        >
-          <MdSend size={20} />
-          Enviar Convites Pendentes
-        </button>
-        <button
-          onClick={() => openPopupAdicionarContato()}
-          className="flex gap-2 text-sm p-2 rounded-md bg-[#264F57] text-white hover:text-[#55C6B1] hover:bg-[#c9fff4] transition-colors duration-150"
-        >
-          <MdContactMail size={20} />
-          Convidar Contatos
-        </button>
-      </div>
-
       <div className="py-4">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -366,46 +292,38 @@ const EventoParticipantes = ({ evento }) => {
                     </div>
                   </td>
                   <td className="px-4 py-3 md:px-6 md:py-4 whitespace-nowrap block md:table-cell">
-                    <div className="flex flex-row items-start justify-around md:justify-start sm:items-center mt-1 md:mt-0">     
-                      {(evento.status === 1 || evento.status === 3) && (
+                    <div className="flex flex-row items-start justify-around md:justify-start sm:items-center mt-1 md:mt-0">                      
+                      <button
+                        onClick={() => handleVerPagamento(participante)}
+                        title="Ver Pagamento"
+                        className="p-2 rounded-md text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-400 transition-colors duration-150"
+                      >
+                        <MdAttachMoney size={20} />
+                      </button>
+                      <button
+                        onClick={() => handleConvidar(eventoId, participante)}
+                        title="Convidar"
+                        className="p-2 rounded-md text-[#55C6B1] hover:bg-[#c9fff4] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#55C6B1] transition-colors duration-150"
+                      >
+                        <MdMail size={20} />
+                      </button>
+                      {(participante.status === 1 || participante.status === 0) && (
                         <button
-                          onClick={() => handleVerPagamento(participante)}
-                          title="Ver Pagamento"
-                          className="p-2 rounded-md text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-400 transition-colors duration-150"
+                          onClick={() => handleConfirmarParticipante(participante)}
+                          title="Confirmar Participante"
+                          className="p-2 rounded-md text-[#00ef33] hover:bg-[#c4ffd1] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#00ef33] transition-colors duration-150"
                         >
-                          <MdAttachMoney size={20} />
+                          <MdCheckCircle size={20} />
                         </button>
                       )}
-                      {evento.status === 0 && (
-                        <>
-                          <button
-                            onClick={() => handleConvidar(participante)}
-                            title="Convidar"
-                            className="p-2 rounded-md text-[#55C6B1] hover:bg-[#c9fff4] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#55C6B1] transition-colors duration-150"
-                          >
-                            <MdMail size={20} />
-                          </button>
-
-                          {(participante.status === 1 || participante.status === 0) && (
-                            <button
-                              onClick={() => handleConfirmarParticipante(participante)}
-                              title="Confirmar Participante"
-                              className="p-2 rounded-md text-[#00ef33] hover:bg-[#c4ffd1] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#00ef33] transition-colors duration-150"
-                            >
-                              <MdCheckCircle size={20} />
-                            </button>
-                          )}
-
-                          {(participante.status === 1 || participante.status === 2) && (
-                            <button
-                              onClick={() => handleRecusarParticipante(participante)}
-                              title="Recusar Participante"
-                              className="p-2 rounded-md text-[#d30038] hover:bg-[#ffc1d2] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#d30038] transition-colors duration-150"
-                            >
-                              <IoMdCloseCircle size={20} />
-                            </button>
-                          )}
-                        </>
+                      {(participante.status === 1 || participante.status === 2) && (
+                        <button
+                          onClick={() => handleRecusarParticipante(participante)}
+                          title="Recusar Participante"
+                          className="p-2 rounded-md text-[#d30038] hover:bg-[#ffc1d2] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#d30038] transition-colors duration-150"
+                        >
+                          <IoMdCloseCircle size={20} />
+                        </button>
                       )}
                     </div>
                   </td>
@@ -415,23 +333,8 @@ const EventoParticipantes = ({ evento }) => {
           </table>
         </div>
       )}
-
-      {showPopup && (
-        <ConvidarContatoPopup
-          evento={evento}
-          onClose={closePopupAdicionarContato}
-        />
-      )}
-
-      {showPagamentoParticipantePopup && (
-        <PagamentoParticipantePopup
-          participante={selectedParticipante}
-          onClose={closePagamentoParticipantePopup}
-        />
-      )}
-      
     </div>
   );
 };
 
-export default EventoParticipantes;
+export default TabelaParticipantes;

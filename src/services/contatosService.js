@@ -26,6 +26,32 @@ export const todosContatos = async () => {
   }
 };
 
+export const todosContatosDisponveisEvento = async (eventoId) => {
+  try {
+    
+    // Fake delay of 1 second
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const response = await requisitar(`/contatos/disponiveis/${eventoId}`);
+
+    const result = await response.json();
+
+    if (result.sucesso) {
+      return result.dados;
+    } else {
+      let errorMessage = 'Erro ao recuperar os contatos.';
+      if (result.erros && Array.isArray(result.erros) && result.erros.length > 0) {
+        errorMessage = result.erros.join(', ');
+      } else if (result.mensagem) {
+        errorMessage = result.mensagem;
+      }
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 export const criarContato = async (nome, email, telefone, ativo = true) => {
   try {
     const contato = {
