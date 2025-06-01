@@ -5,7 +5,7 @@ import { requisitar } from '../util/requisicaoApi';
  */
 export const listarListasCustoPorEvento = async (eventoId) => {
   try {
-    const response = await requisitar(`/evento/${eventoId}`);
+    const response = await requisitar(`/listacusto/evento/${eventoId}`);
 
     const result = await response.json();
 
@@ -30,7 +30,7 @@ export const listarListasCustoPorEvento = async (eventoId) => {
  */
 export const criarListaCusto = async (eventoId, lista) => {
   try {
-    const response = await requisitar(`/evento/${eventoId}/criar`, {
+    const response = await requisitar(`/listaCusto/evento/${eventoId}/criar`, {
       method: 'POST',
       body: JSON.stringify(lista),
     });
@@ -58,7 +58,7 @@ export const criarListaCusto = async (eventoId, lista) => {
  */
 export const adicionarParticipantes = async (listaCustoId, participantes) => {
   try {
-    const response = await requisitar(`/${listaCustoId}/participantes/adicionar`, {
+    const response = await requisitar(`/listaCusto/${listaCustoId}/participantes/adicionar`, {
       method: 'POST',
       body: JSON.stringify(participantes),
     });
@@ -86,7 +86,7 @@ export const adicionarParticipantes = async (listaCustoId, participantes) => {
  */
 export const removerParticipantes = async (listaCustoId, participantes) => {
   try {
-    const response = await requisitar(`/${listaCustoId}/participantes/remover`, {
+    const response = await requisitar(`/listaCusto/${listaCustoId}/participantes/remover`, {
       method: 'POST',
       body: JSON.stringify(participantes),
     });
