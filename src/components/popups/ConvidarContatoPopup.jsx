@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { todosContatosDisponveisEvento } from '../../services/contatosService';
 import { adicionarParticipantes } from '../../services/participanteService';
 import { useSnackbar } from '../../util/SnackbarProvider';
+import { ClipLoader } from "react-spinners";
 
 const ConvidarContatoPopup = ({ evento, onClose }) => {
   const [contatos, setContatos] = useState([]);
@@ -85,14 +86,20 @@ const ConvidarContatoPopup = ({ evento, onClose }) => {
               <tr className="bg-[#55C6B1] text-white">
                 <th className="p-2"></th>
                 <th className="p-2 text-left">Nome</th>
-                <th className="p-2 text-left">Email</th>
+                <th className="p-2 text-left">Email</th>    
               </tr>
             </thead>
             <tbody>
               {carregando ? (
                 <tr>
                   <td colSpan="3" className="p-4 text-center">
-                    Carregando...
+                    <ClipLoader
+                      color={"#55C6B1"}
+                      loading={carregando}
+                      size={50}
+                      aria-label="Loading Spinner"
+                      data-testid="loader"
+                    />
                   </td>
                 </tr>
               ) : contatosFiltrados.length === 0 ? (

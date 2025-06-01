@@ -13,7 +13,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Estilo padrão do p
 // --- ADDED IMPORT FOR CLIPLOADER ---
 import { ClipLoader } from 'react-spinners';
 import ConvidarContatoPopup from './popups/ConvidarContatoPopup';
-
+import PagamentoParticipantePopup from './popups/PagamentoParticipantePopup';
 
 const EventoParticipantes = ({ evento }) => {
   const { showSnackbar } = useSnackbar();
@@ -22,6 +22,8 @@ const EventoParticipantes = ({ evento }) => {
   const [error, setError] = useState(null);
   const [filtro, setFiltro] = useState('');  
   const [showPopup, setShowPopup] = useState(false);
+  const [showPagamentoParticipantePopup, setShowPagamentoParticipantePopup] = useState(false);
+  const [selectedParticipante, setSelectedParticipante] = useState(null);
 
   const fetchParticipantes = useCallback(async () => {
     if (!evento.id) {
@@ -48,8 +50,8 @@ const EventoParticipantes = ({ evento }) => {
   }, [fetchParticipantes]);
 
   const handleVerPagamento = (participante) => {
-    console.log(`Ver pagamento do participante: ${participante.id} (${participante.nome})`);
-    alert(`Ação: Ver pagamento do participante ${participante.nome}. Implementação pendente.`);
+    setSelectedParticipante(participante);
+    setShowPagamentoParticipantePopup(true);
   };
 
   const handleConvidar = (participante) => {
@@ -226,6 +228,15 @@ const EventoParticipantes = ({ evento }) => {
     }
   };
 
+  const closePagamentoParticipantePopup = (refresh = false) => {
+    setShowPagamentoParticipantePopup(false);
+    if (refresh) {
+      fetchParticipantes();
+    }
+  };
+
+  
+
   const participantesFiltrados = participantes.filter(participante => {
     const termoBusca = filtro.toLowerCase();
     return (
@@ -355,38 +366,46 @@ const EventoParticipantes = ({ evento }) => {
                     </div>
                   </td>
                   <td className="px-4 py-3 md:px-6 md:py-4 whitespace-nowrap block md:table-cell">
-                    <div className="flex flex-row items-start justify-around md:justify-start sm:items-center mt-1 md:mt-0">                      
-                      <button
-                        onClick={() => handleVerPagamento(participante)}
-                        title="Ver Pagamento"
-                        className="p-2 rounded-md text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-400 transition-colors duration-150"
-                      >
-                        <MdAttachMoney size={20} />
-                      </button>
-                      <button
-                        onClick={() => handleConvidar(participante)}
-                        title="Convidar"
-                        className="p-2 rounded-md text-[#55C6B1] hover:bg-[#c9fff4] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#55C6B1] transition-colors duration-150"
-                      >
-                        <MdMail size={20} />
-                      </button>
-                      {(participante.status === 1 || participante.status === 0) && (
+                    <div className="flex flex-row items-start justify-around md:justify-start sm:items-center mt-1 md:mt-0">     
+                      {(evento.status === 1 || evento.status === 3) && (
                         <button
-                          onClick={() => handleConfirmarParticipante(participante)}
-                          title="Confirmar Participante"
-                          className="p-2 rounded-md text-[#00ef33] hover:bg-[#c4ffd1] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#00ef33] transition-colors duration-150"
+                          onClick={() => handleVerPagamento(participante)}
+                          title="Ver Pagamento"
+                          className="p-2 rounded-md text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-400 transition-colors duration-150"
                         >
-                          <MdCheckCircle size={20} />
+                          <MdAttachMoney size={20} />
                         </button>
                       )}
-                      {(participante.status === 1 || participante.status === 2) && (
-                        <button
-                          onClick={() => handleRecusarParticipante(participante)}
-                          title="Recusar Participante"
-                          className="p-2 rounded-md text-[#d30038] hover:bg-[#ffc1d2] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#d30038] transition-colors duration-150"
-                        >
-                          <IoMdCloseCircle size={20} />
-                        </button>
+                      {evento.status === 0 && (
+                        <>
+                          <button
+                            onClick={() => handleConvidar(participante)}
+                            title="Convidar"
+                            className="p-2 rounded-md text-[#55C6B1] hover:bg-[#c9fff4] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#55C6B1] transition-colors duration-150"
+                          >
+                            <MdMail size={20} />
+                          </button>
+
+                          {(participante.status === 1 || participante.status === 0) && (
+                            <button
+                              onClick={() => handleConfirmarParticipante(participante)}
+                              title="Confirmar Participante"
+                              className="p-2 rounded-md text-[#00ef33] hover:bg-[#c4ffd1] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#00ef33] transition-colors duration-150"
+                            >
+                              <MdCheckCircle size={20} />
+                            </button>
+                          )}
+
+                          {(participante.status === 1 || participante.status === 2) && (
+                            <button
+                              onClick={() => handleRecusarParticipante(participante)}
+                              title="Recusar Participante"
+                              className="p-2 rounded-md text-[#d30038] hover:bg-[#ffc1d2] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#d30038] transition-colors duration-150"
+                            >
+                              <IoMdCloseCircle size={20} />
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                   </td>
@@ -403,6 +422,14 @@ const EventoParticipantes = ({ evento }) => {
           onClose={closePopupAdicionarContato}
         />
       )}
+
+      {showPagamentoParticipantePopup && (
+        <PagamentoParticipantePopup
+          participante={selectedParticipante}
+          onClose={closePagamentoParticipantePopup}
+        />
+      )}
+      
     </div>
   );
 };

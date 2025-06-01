@@ -5,7 +5,7 @@ import { requisitar } from '../util/requisicaoApi';
  */
 export const aprovarPagamento = async (pagamentoId) => {
   try {
-    const response = await requisitar(`/${pagamentoId}/aprovar`, {
+    const response = await requisitar(`/pagamento/${pagamentoId}/aprovar`, {
       method: 'POST',
     });
 
@@ -26,7 +26,7 @@ export const aprovarPagamento = async (pagamentoId) => {
  */
 export const recusarPagamento = async (pagamentoId) => {
   try {
-    const response = await requisitar(`/${pagamentoId}/recusar`, {
+    const response = await requisitar(`/pagamento/${pagamentoId}/recusar`, {
       method: 'POST',
     });
 
@@ -47,7 +47,8 @@ export const recusarPagamento = async (pagamentoId) => {
  */
 export const listarPagamentosParticipante = async (participanteId) => {
   try {
-    const response = await requisitar(`/${participanteId}/listar`);
+    const response = await requisitar(`/pagamento/${participanteId}/listar`);
+    console.log(response)
 
     const result = await response.json();
 
@@ -66,7 +67,7 @@ export const listarPagamentosParticipante = async (participanteId) => {
  */
 export const informacoesPagamento = async (participanteId) => {
   try {
-    const response = await requisitar(`/${participanteId}`);
+    const response = await requisitar(`/pagamento/${participanteId}`);
 
     const result = await response.json();
 
@@ -88,7 +89,7 @@ export const enviarPagamento = async (participanteId, file) => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await requisitar(`/${participanteId}`, {
+    const response = await requisitar(`/pagamento/${participanteId}`, {
       method: 'POST',
       body: formData,
     });
