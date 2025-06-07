@@ -39,7 +39,7 @@ function Configuracoes() {
               value={form.nome}
               onChange={handleChange}
               placeholder="Insira seu nome completo"
-              className="mt-2 block w-full px-5 py-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3F9184] focus:border-[#3F9184] placeholder-gray-500"
+              className="mt-2 block w-full px-5 py-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3F9184] focus:border-[#3F9184] placeholder-gray-500 text-black"
             />
           </div>
 
@@ -81,7 +81,7 @@ function Configuracoes() {
               value={form.chavePix}
               onChange={handleChange}
               placeholder="Insira sua chave Pix"
-              className="mt-2 block w-full px-5 py-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3F9184] focus:border-[#3F9184] placeholder-gray-500"
+              className="mt-2 block w-full px-5 py-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3F9184] focus:border-[#3F9184] placeholder-gray-500 text-black"
             />
           </div>
 
