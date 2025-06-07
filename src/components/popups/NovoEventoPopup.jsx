@@ -6,8 +6,12 @@ import { criarEvento } from "../../services/eventosService";
 import { useSnackbar } from "../../util/SnackbarProvider";
 import Select from "react-select";
 import { PropagateLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom"; 
 
 function NovoEventoPopup({ onClose }) {
+
+  const navigate = useNavigate();
+
   const { showSnackbar } = useSnackbar();
 
   const [contactsOptions, setContactsOptions] = useState([]);
@@ -176,6 +180,21 @@ function NovoEventoPopup({ onClose }) {
               placeholder="Selecione o local"
               className="shadow-md"
               menuPlacement="top"
+              noOptionsMessage={() => (
+                <div className="text-center text-sm p-2">
+                  Você não tem locais cadastrados.
+                  <br />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); 
+                      navigate("/locais");
+                    }}
+                    className="mt-2 text-[#55c6b1] underline hover:text-[#3e8682]"
+                  >
+                    Cadastrar agora
+                  </button>
+                </div>
+              )}
               styles={{
                 control: (base) => ({
                   ...base,
@@ -201,67 +220,83 @@ function NovoEventoPopup({ onClose }) {
             />
           </div>
 
-          <div className="w-full mb-4">
-            <label className="text-[#264f57] font-medium mb-2 block flex items-center">
-              <MdContacts size={20} className="mr-2 text-[#264f57]" />
-              Contatos para convidar
-            </label>
-            <Select
-              isMulti
-              options={contactsOptions}
-              value={selectedContatos}
-              onChange={setSelectedContatos}
-              placeholder="Selecione os contatos"
-              menuPlacement="top"
-              className="shadow-md"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderColor: "#55c6b1",
-                  padding: 10,
-                  borderWidth: 2,
-                  borderRadius: 8,
-                  boxShadow: "none",
-                  "&:hover": { borderColor: "#3e8682" },
-                  flexWrap: "wrap", // Allow wrapping of content
-                  minHeight: 42,
-                }),
-                multiValue: (base) => ({
-                  ...base,
-                  backgroundColor: "#55c6b1",
+         <div className="w-full mb-4">
+          <label className="text-[#264f57] font-medium mb-2 block flex items-center">
+            <MdContacts size={20} className="mr-2 text-[#264f57]" />
+            Contatos para convidar
+          </label>
+          <Select
+            isMulti
+            options={contactsOptions}
+            value={selectedContatos}
+            onChange={setSelectedContatos}
+            placeholder="Selecione os contatos"
+            menuPlacement="top"
+            className="shadow-md"
+            noOptionsMessage={() => (
+              <div className="text-center text-sm p-2">
+                Você não tem contatos cadastrados.
+                <br />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // impede o fechamento do menu
+                    navigate("/contatos");
+                  }}
+                  className="mt-2 text-[#55c6b1] underline hover:text-[#3e8682]"
+                >
+                  Cadastrar agora
+                </button>
+              </div>
+            )}
+            styles={{
+              control: (base) => ({
+                ...base,
+                borderColor: "#55c6b1",
+                padding: 10,
+                borderWidth: 2,
+                borderRadius: 8,
+                boxShadow: "none",
+                "&:hover": { borderColor: "#3e8682" },
+                flexWrap: "wrap",
+                minHeight: 42,
+              }),
+              multiValue: (base) => ({
+                ...base,
+                backgroundColor: "#55c6b1",
+                color: "white",
+                margin: "2px",
+              }),
+              multiValueLabel: (base) => ({
+                ...base,
+                color: "white",
+              }),
+              multiValueRemove: (base) => ({
+                ...base,
+                color: "white",
+                ":hover": {
+                  backgroundColor: "#3e8682",
                   color: "white",
-                  margin: "2px",
-                }),
-                multiValueLabel: (base) => ({
-                  ...base,
-                  color: "white",
-                }),
-                multiValueRemove: (base) => ({
-                  ...base,
-                  color: "white",
-                  ":hover": {
-                    backgroundColor: "#3e8682",
-                    color: "white",
-                  },
-                }),
-                valueContainer: (base) => ({
-                  ...base,
-                  flexWrap: "wrap", // **this is important** — allows selected items to wrap inside container
-                  overflow: "visible",
-                }),
-                option: (base, { isFocused, isSelected }) => ({
-                  ...base,
-                  backgroundColor: isSelected
-                    ? "#55c6b1"
-                    : isFocused
-                    ? "#e6f7f4"
-                    : "white",
-                  color: "black",
-                  cursor: "pointer",
-                }),
-              }}
-            />
-          </div>
+                },
+              }),
+              valueContainer: (base) => ({
+                ...base,
+                flexWrap: "wrap",
+                overflow: "visible",
+              }),
+              option: (base, { isFocused, isSelected }) => ({
+                ...base,
+                backgroundColor: isSelected
+                  ? "#55c6b1"
+                  : isFocused
+                  ? "#e6f7f4"
+                  : "white",
+                color: "black",
+                cursor: "pointer",
+              }),
+            }}
+          />
+        </div>
+
 
           {error && (
             <div className="text-red-500 text-sm mt-2 max-w-full break-words">

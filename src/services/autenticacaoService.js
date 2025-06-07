@@ -30,3 +30,45 @@ export const registrar = async (nome, email, numero, password) => {
 
   return data;
 };
+export const atualizarUsuario = async ({ nome, email, senha, numero, chavePix, tipoChavePix }) => {
+  const token = localStorage.getItem('token');
+
+  const response = await fetch(`${API_URL}/auth/atualizar`, {
+    method: 'PATCH', 
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ nome, email, senha, numero, chavePix, tipoChavePix }),  
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    const error = new Error(data.mensagem || 'Erro ao atualizar usuário');
+    error.erros = data.erros; 
+    throw error;
+  }
+
+  return data;
+};
+
+
+export const obterUsuarioLogado = async () => {
+  const token = localStorage.getItem('token');
+
+  const response = await fetch(`${API_URL}/auth/usuario`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.mensagem || 'Erro ao obter dados do usuário');
+  }
+
+  return data.dados;  
+};
+
