@@ -18,7 +18,16 @@ function Configuracoes() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => {
+    if (name === 'tipoChavePix') {
+      return {
+        ...prev,
+        tipoChavePix: value,
+        chavePix: '',
+      };
+    }
+    return { ...prev, [name]: value };
+  });
   };
 
   function limparMascara(text) {
