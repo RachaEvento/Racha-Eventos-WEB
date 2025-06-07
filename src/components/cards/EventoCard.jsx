@@ -1,6 +1,13 @@
 import React from "react";
 import { MdEvent } from "react-icons/md";
 
+const statusEventoLabel = {
+  0: "Aberto",
+  1: "Fechado",
+  2: "Cancelado",
+  3: "Finalizado",
+};
+
 function EventoCard({ evento, onClick }) {
   const formatDate = (dateString) => {
     if (!dateString) return null;
@@ -8,7 +15,7 @@ function EventoCard({ evento, onClick }) {
     const dia = date.toLocaleDateString("pt-BR", {
       day: "2-digit",
       month: "2-digit",
-      year: "2-digit", // ano com dois dígitos
+      year: "2-digit",
     });
     const hora = date.toLocaleTimeString("pt-BR", {
       hour: "2-digit",
@@ -49,6 +56,15 @@ function EventoCard({ evento, onClick }) {
     dataTexto = `${dataInicio.dia} ${dataInicio.hora}`;
   }
 
+  const statusLabel = statusEventoLabel[evento.status] ?? "Desconhecido";
+
+  const statusColor = {
+    0: "bg-green-500",
+    1: "bg-yellow-500",
+    2: "bg-red-500",
+    3: "bg-blue-500",
+  }[evento.status] || "bg-gray-500";
+
   return (
     <div
       onClick={onClick}
@@ -62,6 +78,11 @@ function EventoCard({ evento, onClick }) {
         <h3 className="text-[#264f57] font-semibold text-lg text-center">
           {evento.nome}
         </h3>
+
+        {/* Status */}
+        <div className={`px-2 py-1 rounded-full text-xs text-white font-semibold w-fit mx-auto mt-1 ${statusColor}`}>
+          {statusLabel}
+        </div>
 
         {evento.descricao && (
           <p className="text-[#264f57] text-sm text-center mt-1">

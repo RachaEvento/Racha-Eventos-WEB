@@ -10,6 +10,7 @@ import Configuracoes from "./pages/Configuracoes";
 import Eventos from "./pages/Eventos";
 import Evento from "./pages/Evento";
 import Convite from "./pages/Convite";
+import Cobrar from "./pages/Cobrar";
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
         <Route path="/locais" element={<RotaProtegida><Menu><Locais /></Menu></RotaProtegida>} />
         <Route path="/configuracoes" element={<RotaProtegida><Menu><Configuracoes /></Menu></RotaProtegida>} />
         <Route path="/convite/:id" element={<Convite />} />
-
+        <Route path="/cobrar/:id" element={<Cobrar />} />
       </Routes>
     </Router>
     </SnackbarProvider>

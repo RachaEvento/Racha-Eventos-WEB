@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { listarParticipantes } from '../services/participanteService'; // Certifique-se que o caminho está correto
 import { convidarParticipante, confirmarParticipacao, recusarParticipacao, convidarTodosParticipantes } from '../services/conviteService';
+import {  } from '../services/pagamentoService';
 import { useSnackbar } from '../util/SnackbarProvider';
 // Importando os ícones do react-md-icons
 import { MdMail, MdAttachMoney, MdSearch, MdCheckCircle, MdSend, MdContactMail } from 'react-icons/md';
@@ -52,6 +53,87 @@ const EventoParticipantes = ({ evento }) => {
   const handleVerPagamento = (participante) => {
     setSelectedParticipante(participante);
     setShowPagamentoParticipantePopup(true);
+  };
+
+  const handleCobrar = (participante) => {
+    const linkConvite = `${window.location.protocol}//${window.location.host}/cobrar/${participante.id}`;
+    if (participante.email?.trim() !== '') {
+      confirmAlert({
+        message: (
+          <>
+            <p>
+              Você está prestes a enviar uma cobrança para:
+            </p>
+            <strong>{participante.nome}</strong> (<em>{participante.email}</em>)
+            <p>
+              Se preferir, copie o link e envie manualmente ao participante.
+            </p>
+          </>
+        ),
+        buttons: [
+          {
+            label: 'Enviar Cobrança',
+            onClick: async () => {
+              try {
+                setLoading(true);
+                //await convidarParticipante(evento.id, participante.id);
+                confirmAlert({
+                  title: 'Cobrança Enviada!',
+                  message: `A cobrança foi enviado com sucesso para ${participante.nome} (${participante.email}).`,
+                  buttons: [{ label: 'Ok' }]
+                });
+                setParticipantes(prev => prev.map(p =>
+                  p.id === participante.id ? { ...p, status: 1 } : p
+                ));
+                setLoading(false);
+              } catch (inviteErr) {
+                setLoading(false);
+                confirmAlert({
+                  title: 'Erro no Envio',
+                  message: `Não foi possível enviar a cobrança para ${participante.nome}. Detalhes: ${inviteErr.message || 'Erro desconhecido'}`,
+                  buttons: [{ label: 'Ok' }]
+                });
+              }
+            }
+          },
+          {
+            label: 'Link da Cobrança',
+            onClick: () => {
+              navigator.clipboard.writeText(linkConvite);
+              showSnackbar('Link copiado para área de transferência!');
+            }
+          },
+          {
+            label: 'Cancelar'
+          }
+        ]
+      });
+    } else {
+      confirmAlert({
+        message: (
+          <>
+            <p>
+              O participante <strong>{participante.nome}</strong> não possui um e-mail cadastrado.
+            </p>
+            <p>
+              Se preferir, copie o link e envie manualmente ao participante.
+            </p>
+          </>
+        ),
+        buttons: [
+          {
+            label: 'Link da Cobrança',
+            onClick: () => {
+              navigator.clipboard.writeText(linkConvite);
+              showSnackbar('Link copiado para área de transferência!');
+            }
+          },
+          {
+            label: 'Fechar'
+          }
+        ]
+      });
+    }
   };
 
   const handleConvidar = (participante) => {
@@ -370,13 +452,22 @@ const EventoParticipantes = ({ evento }) => {
                   <td className="px-4 py-3 md:px-6 md:py-4 whitespace-nowrap block md:table-cell">
                     <div className="flex flex-row items-start justify-around md:justify-start sm:items-center mt-1 md:mt-0">     
                       {(evento.status === 1 || evento.status === 3) && (
-                        <button
-                          onClick={() => handleVerPagamento(participante)}
-                          title="Ver Pagamento"
-                          className="p-2 rounded-md text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-400 transition-colors duration-150"
-                        >
-                          <MdAttachMoney size={20} />
-                        </button>
+                        <>
+                          <button
+                            onClick={() => handleCobrar(participante)}
+                            title="Cobrar"
+                            className="p-2 rounded-md text-[#55C6B1] hover:bg-[#c9fff4] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#55C6B1] transition-colors duration-150"
+                          >
+                            <MdMail size={20} />
+                          </button>                          
+                          <button
+                            onClick={() => handleVerPagamento(participante)}
+                            title="Ver Pagamento"
+                            className="p-2 rounded-md text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-400 transition-colors duration-150"
+                          >
+                            <MdAttachMoney size={20} />
+                          </button>
+                        </>
                       )}
                       {evento.status === 0 && (
                         <>

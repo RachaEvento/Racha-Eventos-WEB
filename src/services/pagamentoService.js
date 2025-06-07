@@ -91,7 +91,7 @@ export const enviarPagamento = async (participanteId, file) => {
 
     const response = await requisitar(`/pagamento/${participanteId}`, {
       method: 'POST',
-      body: formData,
+      body: formData
     });
 
     const result = await response.json();
