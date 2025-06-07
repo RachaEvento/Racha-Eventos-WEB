@@ -22,7 +22,7 @@ function Configuracoes() {
     if (name === 'tipoChavePix') {
       return {
         ...prev,
-        tipoChavePix: value,
+        tipoChavePix: Number(form.tipoChavePix),
         chavePix: '',
       };
     }
@@ -34,34 +34,33 @@ function Configuracoes() {
   if (!text) return '';
   return text.replace(/[^a-zA-Z0-9]/g, '');
   }
+
   const handleSalvar = async () => {
-      if (!isValidEmail(form.email)) {
-      showSnackbar('Por favor, insira um e-mail válido.', 'error');
-      return;
-    }
-    try {
-      const chavePixLimpa = limparMascara(form.chavePix);
-      console.log('Dados enviados para atualizarUsuario:', {
+  if (!isValidEmail(form.email)) {
+    showSnackbar('Por favor, insira um e-mail válido.', 'error');
+    return;
+  }
+  try {
+    const chavePixLimpa = limparMascara(form.chavePix);
+
+    await atualizarUsuario({
       nome: form.nome,
       email: form.email,
       numero: form.numero,
-      chavePix: form.chavePix,
+      chavePix: chavePixLimpa,
       tipoChavePix: form.tipoChavePix,
     });
 
-      await atualizarUsuario({
-        nome: form.nome,
-        email: form.email,
-        numero: form.numero,
-        chavePix: chavePixLimpa,
-        tipoChavePix: form.tipoChavePix,
-      });
-
-      showSnackbar('Alterações salvas com sucesso!');
-    } catch (error) {
+    showSnackbar('Alterações salvas com sucesso!');
+  } catch (error) {
+    if (error.erros && Array.isArray(error.erros) && error.erros.length > 0) {
+      error.erros.forEach((msg) => showSnackbar(msg, 'error'));
+    } else {
       showSnackbar(error.message || 'Erro ao salvar alterações', 'error');
     }
-  };
+  }
+};
+
   
 
 

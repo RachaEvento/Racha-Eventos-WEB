@@ -30,7 +30,6 @@ export const registrar = async (nome, email, numero, password) => {
 
   return data;
 };
-
 export const atualizarUsuario = async ({ nome, email, senha, numero, chavePix, tipoChavePix }) => {
   const token = localStorage.getItem('token');
 
@@ -46,11 +45,14 @@ export const atualizarUsuario = async ({ nome, email, senha, numero, chavePix, t
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.mensagem || 'Erro ao atualizar usuário');
+    const error = new Error(data.mensagem || 'Erro ao atualizar usuário');
+    error.erros = data.erros; 
+    throw error;
   }
 
   return data;
 };
+
 
 export const obterUsuarioLogado = async () => {
   const token = localStorage.getItem('token');
