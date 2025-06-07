@@ -4,6 +4,7 @@ import Cleave from 'cleave.js/react';
 import { criarContato, editarContato } from '../../services/contatosService';
 import IconInputWrapper from '../../util/IconInputWrapper';
 import { useSnackbar } from '../../util/SnackbarProvider';
+import { isValidEmail } from '../../util/validadores';
 
 function ContatoPopup({ contact, onClose, isNew }) {
   const [editedContact, setEditedContact] = useState({
@@ -44,8 +45,10 @@ function ContatoPopup({ contact, onClose, isNew }) {
 
     if (!editedContact.nome.trim()) {
       errorMsg = 'O nome é obrigatório.';
+    } else if (editedContact.email && !isValidEmail(editedContact.email)) {
+      errorMsg = 'O e-mail é inválido.';
     }
-
+    
     if (errorMsg) {
       setError(errorMsg);      
       setLoading(false);   
