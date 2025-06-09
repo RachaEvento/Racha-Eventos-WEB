@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { buscarEvento } from "../services/eventosService";
+import { alterarStatusEvento, buscarEvento } from "../services/eventosService";
 import { useSnackbar } from "../util/SnackbarProvider";
 import { ClipLoader } from "react-spinners";
 import { MdEvent, MdPlace } from "react-icons/md";
@@ -10,6 +10,8 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import EventoResumo from '../components/EventoResumo'
 import EventoCustos from '../components/EventoCustos'
 import EventoParticipantes from '../components/EventoParticipantes'
+
+const StatusEvento = { Aberto: 0, Fechado: 1, Cancelado: 2, Finalizado: 3 };
 
 function Evento() {
   const [loading, setLoading] = useState(true);
@@ -34,6 +36,43 @@ function Evento() {
   useEffect(() => {
     fetchEventos();
   }, [fetchEventos]);
+
+  const getNextStatus = (status) => {
+    switch (status) {
+      case StatusEvento.Aberto:
+        return StatusEvento.Fechado;
+      case StatusEvento.Fechado:
+        return StatusEvento.Finalizado;
+      default:
+        return null;
+    }
+  };
+  
+  const getNextStatusLabel = (status) => {
+    switch (status) {
+      case StatusEvento.Aberto:
+        return "Fechar evento";
+      case StatusEvento.Fechado:
+        return "Finalizar evento";
+      default:
+        return null;
+    }
+  };
+
+  const handleChangeStatus = async () => {
+    const nextStatus = getNextStatus(data.status);
+    if (nextStatus === null) return;
+  
+    try {
+      setLoading(true);
+      await alterarStatusEvento(data.id, nextStatus);
+      fetchEventos();
+      showSnackbar("Status atualizado com sucesso!");
+    } catch (error) {
+      showSnackbar("Erro ao atualizar status");
+      setLoading(true);
+    }
+  };
 
   const formatDate = (dateString) => {
     try {
@@ -123,10 +162,6 @@ function Evento() {
                     </>
                   )}
                 </p>
-                {/* Status */}
-                <div>
-                  
-                </div>
               </div>
             </div>
 
@@ -173,6 +208,18 @@ function Evento() {
             }>
               Participantes
             </Tab>
+            <div className="ml-auto">
+              {getNextStatus(data.status) !== null ? (
+                <button
+                  onClick={handleChangeStatus}
+                  className="bg-[#55c6b1] text-white hover:bg-[#3e8682] px-4 py-1 rounded text-sm font-semibold shadow"
+                >
+                  {getNextStatusLabel(data.status)}
+                </button>
+              ) : (
+                <span className="text-sm text-gray-500 italic">Status final</span>
+              )}
+            </div>
           </TabList>
           <TabPanels className="p-2">
             <TabPanel><EventoResumo evento={data}/></TabPanel>

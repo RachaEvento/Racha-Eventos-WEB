@@ -137,3 +137,29 @@ export const editarEvento = async ({
     throw new Error(error.message);
   }
 };
+
+
+export const alterarStatusEvento = async (id, status) => {
+  try {
+
+    const response = await requisitar(`/eventos/${id}/status/${status}`, {
+      method: 'POST'
+    });
+
+    const result = await response.json();
+
+    if (result.sucesso) {
+      return result.dados;
+    } else {
+      let errorMessage = 'Erro ao alterar o status do evento.';
+      if (Array.isArray(result.erros) && result.erros.length > 0) {
+        errorMessage = result.erros.join(', ');
+      } else if (result.mensagem) {
+        errorMessage = result.mensagem;
+      }
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};

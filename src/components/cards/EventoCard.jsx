@@ -84,11 +84,11 @@ function EventoCard({ evento, onClick }) {
           {statusLabel}
         </div>
 
-        {evento.descricao && (
+        {/* {evento.descricao && (
           <p className="text-[#264f57] text-sm text-center mt-1">
             {evento.descricao}
           </p>
-        )}
+        )} */}
 
         <div className="flex flex-col sm:flex-col justify-between gap-1 mt-2">
           {evento.localNome && (

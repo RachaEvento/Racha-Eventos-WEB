@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { adicionarCusto, removerCusto } from '../services/custosService';
+import { removerCusto } from '../services/custosService';
 import {
   listarListasCustoPorEvento,
   criarListaCusto,
@@ -8,15 +8,14 @@ import {
 import AdicionarParticipanteListaCustoPopup from './popups/AdicionarParticipanteListaCustoPopup';
 import { useSnackbar } from '../util/SnackbarProvider';
 import { MdClose } from 'react-icons/md';
+import AdicionarCustoListaCustoPopup from './popups/AdicionarCustoListaCustoPopup';
 
 const EventoCustos = ({ evento }) => {
   const [listasCusto, setListasCusto] = useState([]);
   const [erro, setErro] = useState('');
   const [nomeNovaLista, setNomeNovaLista] = useState('');
-  const [nomeNovoCusto, setNomeNovoCusto] = useState('');
-  const [valorNovoCusto, setValorNovoCusto] = useState(0);
-  const [listaSelecionadaId, setListaSelecionadaId] = useState('');
   const [mostrarPopup, setMostrarPopup] = useState(false);
+  const [mostrarPopupCusto, setMostrarPopupCusto] = useState(false);
   const [listaParaAdicionarParticipante, setListaParaAdicionarParticipante] =
     useState(null);
 
@@ -46,24 +45,7 @@ const EventoCustos = ({ evento }) => {
     } catch (e) {
       setErro(e.message);
     }
-  };
-
-  const handleAdicionarCusto = async () => {
-    if (!listaSelecionadaId || !nomeNovoCusto) return;
-
-    try {
-      await adicionarCusto(listaSelecionadaId, {
-        nome: nomeNovoCusto,
-        valor: parseFloat(valorNovoCusto)
-      });
-      setNomeNovoCusto('');
-      setValorNovoCusto(0);
-      await carregarListas();
-      showSnackbar('Custo adicionado com sucesso!');
-    } catch (e) {
-      setErro(e.message);
-    }
-  };
+  };  
 
   const handleRemoverCusto = async (listaId, custoId) => {
     try {
@@ -88,6 +70,19 @@ const EventoCustos = ({ evento }) => {
     }
   };
 
+  const abrirPopupAdicionarCusto = (listaId) => {
+    setListaParaAdicionarParticipante(listaId);
+    setMostrarPopupCusto(true);
+  };
+
+  const fecharPopupAdicionarCusto = async (adicionou) => {
+    setMostrarPopupCusto(false);
+    setListaParaAdicionarParticipante(null);
+    if (adicionou) {
+      await carregarListas();
+    }
+  };
+
   const abrirPopupAdicionarParticipante = (listaId) => {
     setListaParaAdicionarParticipante(listaId);
     setMostrarPopup(true);
@@ -105,8 +100,6 @@ const EventoCustos = ({ evento }) => {
     <div className="p-2 bg-white min-h-screen">
       {erro && <p className="text-red-600">{erro}</p>}
 
-
-      
       {evento.status === 0 && (
       <>
         {/* Criar nova lista */}
@@ -127,47 +120,6 @@ const EventoCustos = ({ evento }) => {
               onClick={handleCriarLista}
             >
               Criar Lista
-            </button>
-          </div>
-        </div>
-
-        {/* Adicionar custo */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-[#264F57] mb-4">
-            Adicionar custo em uma lista
-          </h2>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <select
-              value={listaSelecionadaId}
-              onChange={(e) => setListaSelecionadaId(e.target.value)}
-              className="border rounded px-3 py-2 flex-1"
-            >
-              <option value="">Selecione a lista</option>
-              {listasCusto.map((lista) => (
-                <option key={lista.id} value={lista.id}>
-                  {lista.nome}
-                </option>
-              ))}
-            </select>
-            <input
-              type="text"
-              placeholder="Nome do custo"
-              value={nomeNovoCusto}
-              onChange={(e) => setNomeNovoCusto(e.target.value)}
-              className="border rounded px-3 py-2 flex-1"
-            />
-            <input
-              type="number"
-              placeholder="Valor"
-              value={valorNovoCusto}
-              onChange={(e) => setValorNovoCusto(e.target.value)}
-              className="border rounded px-3 py-2 w-32"
-            />
-            <button
-              className="bg-[#264F57] hover:bg-[#3e8682] text-white px-4 py-2 rounded"
-              onClick={handleAdicionarCusto}
-            >
-              Adicionar Custo
             </button>
           </div>
         </div>
@@ -197,12 +149,18 @@ const EventoCustos = ({ evento }) => {
                   </span>
                 </h3>
                 {evento.status === 0 && (
-                  <button
-                    className="bg-[#55C6B1] hover:bg-[#3e8682] text-white px-4 py-2 rounded"
-                    onClick={() => abrirPopupAdicionarParticipante(lista.id)}
-                  >
-                    Adicionar Participante
-                  </button>
+                  <div className='flex gap-5'>
+                    <button 
+                      className="bg-[#55C6B1] hover:bg-[#3e8682] text-white px-4 py-2 rounded"
+                      onClick={() => abrirPopupAdicionarParticipante(lista.id)}>
+                      Adicionar Participante
+                    </button>
+                    <button
+                      className="bg-[#55C6B1] hover:bg-[#3e8682] text-white px-4 py-2 rounded"
+                      onClick={() => abrirPopupAdicionarCusto(lista.id)}>
+                      Adicionar custos
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -268,6 +226,15 @@ const EventoCustos = ({ evento }) => {
           listaCustoId={listaParaAdicionarParticipante}
           eventoId={evento.id}
           onClose={fecharPopupAdicionarParticipante}
+        />
+      )}
+
+      {/* Popup adicionar custo */}
+      {mostrarPopupCusto && (
+        <AdicionarCustoListaCustoPopup
+          listaCustoId={listaParaAdicionarParticipante}
+          eventoId={evento.id}
+          onClose={fecharPopupAdicionarCusto}
         />
       )}
     </div>
