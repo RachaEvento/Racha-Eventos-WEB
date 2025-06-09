@@ -28,8 +28,15 @@ function Configuracoes() {
     });
   };
 
-  const limparMascara = (text) => {
-    return text ? text.replace(/[^a-zA-Z0-9@.]/g, '') : '';
+  const limparChavePix = (tipo, valor) => {
+    if ([TipoChavePix.CPF, TipoChavePix.CNPJ, TipoChavePix.Telefone].includes(tipo)) {
+      return valor.replace(/\D/g, '');
+    }
+    return valor.trim();
+  };
+
+  const limparNumero = (text) => {
+    return text ? text.replace(/\D/g, '') : '';
   };
 
   const handleSalvar = async () => {
@@ -38,21 +45,47 @@ function Configuracoes() {
       return;
     }
 
+    const chavePixLimpa = limparChavePix(form.tipoChavePix, form.chavePix);
+
+    switch (form.tipoChavePix) {
+      case TipoChavePix.CPF:
+        if (chavePixLimpa.length !== 11) {
+          showSnackbar('Por favor, insira um CPF válido.', 'error');
+          return;
+        }
+        break;
+      case TipoChavePix.CNPJ:
+        if (chavePixLimpa.length !== 14) {
+          showSnackbar('Por favor, insira um CNPJ válido.', 'error');
+          return;
+        }
+        break;
+      case TipoChavePix.Telefone:
+        if (chavePixLimpa.length < 10 || chavePixLimpa.length > 11) {
+          showSnackbar('Por favor, insira um número de telefone válido.', 'error');
+          return;
+        }
+        break;
+    }
+
     try {
-      const chavePixLimpa = limparMascara(form.chavePix);
+      const numeroLimpo = limparNumero(form.numero);
+
       await atualizarUsuario({
         nome: form.nome,
         email: form.email,
-        numero: form.numero,
+        numero: numeroLimpo,
         chavePix: chavePixLimpa,
         tipoChavePix: form.tipoChavePix,
       });
+
       showSnackbar('Alterações salvas com sucesso!');
     } catch (error) {
       const mensagens = error.erros || [error.message || 'Erro ao salvar alterações'];
       mensagens.forEach((msg) => showSnackbar(msg, 'error'));
     }
   };
+
 
   useEffect(() => {
     const fetchUsuario = async () => {
@@ -77,7 +110,7 @@ function Configuracoes() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl w-full space-y-10 bg-white p-10 rounded-xl shadow-lg">
         <div className="text-center">
-          <h2 className="text-4xl font-bold text-black mb-2">Atualize suas Informações</h2>
+          <h2 className="text-4xl font-bold text-black mb-2">Atualize suas informações</h2>
           <p className="text-lg text-gray-600 text-black">
             Gerencie suas credenciais de forma segura. Atualize seu nome, e-mail ou chave Pix a qualquer momento.
           </p>
@@ -135,6 +168,7 @@ function Configuracoes() {
             <label htmlFor="chavePix" className="block text-sm font-medium text-black">Chave Pix</label>
             {pixOptions ? (
               <Cleave
+                key={form.tipoChavePix}
                 id="chavePix"
                 name="chavePix"
                 value={form.chavePix}
@@ -145,6 +179,7 @@ function Configuracoes() {
               />
             ) : (
               <input
+                key={form.tipoChavePix}
                 id="chavePix"
                 name="chavePix"
                 type="text"
