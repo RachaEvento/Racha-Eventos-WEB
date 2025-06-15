@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { 
-  listarPagamentosParticipante, 
-  aprovarPagamento, 
-  recusarPagamento 
+import {
+  listarPagamentosParticipante,
+  aprovarPagamento,
+  recusarPagamento
 } from '../../services/pagamentoService';
-import { 
-  MdClose, 
-  MdCheckCircle, 
-  MdCancel, 
-  MdReceipt 
+import {
+  MdClose,
+  MdCheckCircle,
+  MdCancel,
+  MdReceipt
 } from 'react-icons/md';
 
 import { ClipLoader } from 'react-spinners';
@@ -21,7 +21,7 @@ const statusMap = {
   3: { label: 'Pago', color: 'bg-green-100 text-green-800' },
 };
 
-const PagamentoParticipantePopup = ({ participante, onClose }) => {  
+const PagamentoParticipantePopup = ({ participante, onClose, evento }) => {
   const { showSnackbar } = useSnackbar();
   const [pagamentos, setPagamentos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,8 +66,7 @@ const PagamentoParticipantePopup = ({ participante, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-6 w-full max-w-3xl relative">
-        
+      <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-[95vw] sm:max-w-3xl relative max-h-[90vh] overflow-y-auto">
         {/* Botão fechar */}
         <button
           className="absolute top-2 right-2 text-[#264F57] hover:text-[#3e8682] text-2xl font-bold"
@@ -97,19 +96,19 @@ const PagamentoParticipantePopup = ({ participante, onClose }) => {
               };
 
               return (
-                <div 
-                  key={pagamento.pagamentoId} 
-                  className="border rounded-lg p-4 shadow-sm flex justify-between items-center"
+                <div
+                  key={pagamento.pagamentoId}
+                  className="border rounded-lg p-4 shadow-sm flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4"
                 >
                   <div>
                     <p><strong>Data:</strong> {new Date(pagamento.dataPagamento).toLocaleDateString()}</p>
-                    <div 
+                    <div
                       className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${status.color}`}
                     >
                       {status.label}
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     {pagamento.comprovante && (
                       <button
                         className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center gap-1"
@@ -118,18 +117,23 @@ const PagamentoParticipantePopup = ({ participante, onClose }) => {
                         <MdReceipt /> Ver Comprovante
                       </button>
                     )}
-                    <button
-                      className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 flex items-center gap-1"
-                      onClick={() => handleAprovar(pagamento.pagamentoId)}
-                    >
-                      <MdCheckCircle /> Aprovar
-                    </button>
-                    <button
-                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1"
-                      onClick={() => handleRecusar(pagamento.pagamentoId)}
-                    >
-                      <MdCancel /> Recusar
-                    </button>
+                    
+                    {(evento.status === 1) && (  
+                    <>
+                      <button
+                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 flex items-center gap-1"
+                        onClick={() => handleAprovar(pagamento.pagamentoId)}
+                      >
+                        <MdCheckCircle /> Aprovar
+                      </button>
+                      <button
+                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1"
+                        onClick={() => handleRecusar(pagamento.pagamentoId)}
+                      >
+                        <MdCancel /> Recusar
+                      </button>
+                    </>
+                    )}
                   </div>
                 </div>
               );
@@ -141,7 +145,7 @@ const PagamentoParticipantePopup = ({ participante, onClose }) => {
       {/* Modal de comprovante */}
       {comprovanteSelecionado && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-60">
-          <div className="bg-white p-4 rounded-lg relative max-w-3xl">
+          <div className="bg-white p-4 rounded-lg relative w-[95vw] max-w-3xl max-h-[90vh] overflow-y-auto">
             <button
               className="absolute top-2 right-2 text-[#264F57] hover:text-[#3e8682] text-2xl font-bold"
               onClick={() => setComprovanteSelecionado(null)}
@@ -151,8 +155,8 @@ const PagamentoParticipantePopup = ({ participante, onClose }) => {
             <h3 className="text-xl mb-4 text-[#264F57] font-semibold flex items-center gap-2">
               <MdReceipt /> Comprovante
             </h3>
-            <img 
-              src={`data:image/*;base64,${comprovanteSelecionado}`} 
+            <img
+              src={`data:image/*;base64,${comprovanteSelecionado}`}
               alt="Comprovante"
               className="max-h-[80vh] mx-auto"
             />

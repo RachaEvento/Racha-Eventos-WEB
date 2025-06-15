@@ -1,6 +1,48 @@
 import { requisitar } from '../util/requisicaoApi';
 
 /**
+ * Cobrar todos participantes do evento
+ */
+export const cobrarTodosParticipantes = async (eventoId) => {
+  try {
+    const response = await requisitar(`/pagamento/evento/${eventoId}/cobrar/todos`, {
+      method: 'POST',
+    });
+
+    const result = await response.json();
+
+    if (result.sucesso) {
+      return result.mensagem || 'Cobranças enviados.';
+    } else {
+      throw new Error(result.erros?.join(', ') || result.mensagem || 'Erro ao cobrar participantes.');
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+/**
+ * Cobrar um participante específico do evento
+ */
+export const cobrarParticipante = async (eventoId, participanteId) => {
+  try {
+    const response = await requisitar(`/pagamento/evento/${eventoId}/cobrar/${participanteId}`, {
+      method: 'POST',
+    });
+
+    const result = await response.json();
+
+    if (result.sucesso) {
+      return result.mensagem || 'Cobrança enviada.';
+    } else {
+      throw new Error(result.erros?.join(', ') || result.mensagem || 'Erro ao cobrar participante.');
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+/**
  * Aprovar o pagamento de um participante
  */
 export const aprovarPagamento = async (pagamentoId) => {

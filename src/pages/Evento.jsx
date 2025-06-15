@@ -59,13 +59,20 @@ function Evento() {
     }
   };
 
-  const handleChangeStatus = async () => {
+  const handleChangeStatus = async (isCancelar = false) => {
     const nextStatus = getNextStatus(data.status);
     if (nextStatus === null) return;
   
     try {
       setLoading(true);
-      await alterarStatusEvento(data.id, nextStatus);
+
+      if (isCancelar) {
+        await alterarStatusEvento(data.id, StatusEvento.Cancelado);
+      }
+      else {
+        await alterarStatusEvento(data.id, nextStatus);
+      }
+
       fetchEventos();
       showSnackbar("Status atualizado com sucesso!");
     } catch (error) {
@@ -114,7 +121,7 @@ function Evento() {
       case 0:
         return { label: "Aberto", bg: "bg-green-500", text: "text-white" };
       case 1:
-        return { label: "Fechado", bg: "bg-gray-500", text: "text-white" };
+        return { label: "Fechado", bg: "bg-yellow-500", text: "text-white" };
       case 2:
         return { label: "Cancelado", bg: "bg-red-500", text: "text-white" };
       case 3:
@@ -144,11 +151,6 @@ function Evento() {
                 <div className="flex items-center gap-2">
                 <h1 className="flex gap-[5px] justify-center text-xl md:text-2xl font-bold text-[#264f57]">
                   {data.nome}
-                  <p className={`inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-semibold
-                    ${getStatusStyle(data.status).bg} 
-                    ${getStatusStyle(data.status).text}`}>
-                    {getStatusStyle(data.status).label}
-                  </p>
                 </h1>
                 </div>
                 <p className="text-[#264f57] text-sm">{data.descricao}</p>
@@ -162,12 +164,38 @@ function Evento() {
                     </>
                   )}
                 </p>
+                <div className="flex flex-col md:flex-row md:justify-between mt-2 gap-2 md:gap-0">
+                  <p className={`inline-flex justify-center px-4 py-1 rounded text-xs md:text-sm font-semibold
+                    ${getStatusStyle(data.status).bg} 
+                    ${getStatusStyle(data.status).text}`}>
+                    {getStatusStyle(data.status).label}
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-2 md:items-center">
+                    {(data.status === 1 || data.status === 0) && (
+                      <button
+                        onClick={() => handleChangeStatus(true)}
+                        className="bg-[#c60000] text-white hover:bg-[#930000] px-4 py-1 rounded text-sm font-semibold"
+                      >
+                        Cancelar evento
+                      </button>
+                    )}
+                    {getNextStatus(data.status) !== null && (
+                      <button
+                        onClick={handleChangeStatus}
+                        className="bg-[#55c6b1] text-white hover:bg-[#3e8682] px-4 py-1 rounded text-sm font-semibold shadow"
+                      >
+                        {getNextStatusLabel(data.status)}
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Right: Local Info */}
             {data.localNome && (
-              <div className="bg-[#55c6b1] text-white rounded-lg p-4 flex flex-col w-full md:w-64">
+              <div className="bg-[#55c6b1] text-white rounded-lg p-4 flex flex-col w-full md:w-64 min-w-[300px]">
                 <h2 className="text-lg font-semibold mb-1 flex justify-between">                  
                   <span>{data.localNome}</span>
                   <MdPlace size={32} className="text-white" />
@@ -207,19 +235,7 @@ function Evento() {
               }`
             }>
               Participantes
-            </Tab>
-            <div className="ml-auto">
-              {getNextStatus(data.status) !== null ? (
-                <button
-                  onClick={handleChangeStatus}
-                  className="bg-[#55c6b1] text-white hover:bg-[#3e8682] px-4 py-1 rounded text-sm font-semibold shadow"
-                >
-                  {getNextStatusLabel(data.status)}
-                </button>
-              ) : (
-                <span className="text-sm text-gray-500 italic">Status final</span>
-              )}
-            </div>
+            </Tab>            
           </TabList>
           <TabPanels className="p-2">
             <TabPanel><EventoResumo evento={data}/></TabPanel>

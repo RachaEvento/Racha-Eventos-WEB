@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { listarParticipantes } from '../services/participanteService'; // Certifique-se que o caminho está correto
 import { convidarParticipante, confirmarParticipacao, recusarParticipacao, convidarTodosParticipantes } from '../services/conviteService';
-import {  } from '../services/pagamentoService';
+import { cobrarParticipante, cobrarTodosParticipantes } from '../services/pagamentoService';
 import { useSnackbar } from '../util/SnackbarProvider';
 // Importando os ícones do react-md-icons
 import { MdMail, MdAttachMoney, MdSearch, MdCheckCircle, MdSend, MdContactMail } from 'react-icons/md';
@@ -76,7 +76,7 @@ const EventoParticipantes = ({ evento }) => {
             onClick: async () => {
               try {
                 setLoading(true);
-                //await convidarParticipante(evento.id, participante.id);
+                await cobrarParticipante(evento.id, participante.id);
                 confirmAlert({
                   title: 'Cobrança Enviada!',
                   message: `A cobrança foi enviado com sucesso para ${participante.nome} (${participante.email}).`,
@@ -299,6 +299,40 @@ const EventoParticipantes = ({ evento }) => {
       });
   };
 
+  const cobrarParticipantesPendentes = () => {
+    confirmAlert({
+      message: (
+        <>
+          <p>
+            Você está prestes a enviar uma cobrança para todos os participantes com pagamentos pendentes.
+          </p>
+        </>
+      ),
+      buttons: [
+        {
+          label: 'Enviar',
+          onClick: async () => {
+            try {
+              setLoading(true);
+              await cobrarTodosParticipantes(evento.id);
+              showSnackbar('Cobranças Enviadas!');
+              setLoading(false);
+            } catch (inviteErr) {
+              setLoading(false);
+              confirmAlert({
+                message: `Não foi possível enviar as cobranças. Detalhes: ${inviteErr.message || 'Erro desconhecido'}`,
+                buttons: [{ label: 'Ok' }]
+              });
+            }
+          }
+        },
+        {
+          label: 'Cancelar'
+        }
+      ]
+    });
+};
+
   const openPopupAdicionarContato = () => {
     setShowPopup(true);
   }
@@ -353,6 +387,17 @@ const EventoParticipantes = ({ evento }) => {
 
   return (
     <div className="overflow-hidden">
+      {evento.status === 1 && (
+        <div className="flex justify-end gap-5">
+          <button
+            onClick={() => cobrarParticipantesPendentes()}
+            className="flex gap-2 text-sm p-2 rounded-md bg-[#55C6B1] text-white hover:text-[#55C6B1] hover:bg-[#c9fff4] transition-colors duration-150"
+          >
+            <MdSend size={20} />
+            Enviar Cobranças Pendentes
+          </button>
+        </div>
+      )}
       {evento.status === 0 && (
         <div className="flex justify-end gap-5">
           <button
@@ -451,15 +496,16 @@ const EventoParticipantes = ({ evento }) => {
                   </td>
                   <td className="px-4 py-3 md:px-6 md:py-4 whitespace-nowrap block md:table-cell">
                     <div className="flex flex-row items-start justify-around md:justify-start sm:items-center mt-1 md:mt-0">     
-                      {(evento.status === 1 || evento.status === 3) && (
-                        <>
+                      {(evento.status === 1) && (
                           <button
                             onClick={() => handleCobrar(participante)}
                             title="Cobrar"
                             className="p-2 rounded-md text-[#55C6B1] hover:bg-[#c9fff4] focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#55C6B1] transition-colors duration-150"
                           >
                             <MdMail size={20} />
-                          </button>                          
+                          </button>
+                      )}
+                      {(evento.status === 1 || evento.status === 3) && (                
                           <button
                             onClick={() => handleVerPagamento(participante)}
                             title="Ver Pagamento"
@@ -467,7 +513,6 @@ const EventoParticipantes = ({ evento }) => {
                           >
                             <MdAttachMoney size={20} />
                           </button>
-                        </>
                       )}
                       {evento.status === 0 && (
                         <>
@@ -520,6 +565,7 @@ const EventoParticipantes = ({ evento }) => {
         <PagamentoParticipantePopup
           participante={selectedParticipante}
           onClose={closePagamentoParticipantePopup}
+          evento={evento}
         />
       )}
       
