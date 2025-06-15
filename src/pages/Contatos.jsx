@@ -20,8 +20,14 @@ function Contatos() {
     setLoading(true);
     try {
       const data = await todosContatos();
-      setContacts(data);
-      setFilteredContacts(data);
+      const contatosTratados = data.map(contato => ({
+      ...contato,
+      fotoBase64: contato.fotoBase64 
+        ? `data:image/jpeg;base64,${contato.fotoBase64}` 
+        : null
+    }));
+      setContacts(contatosTratados);
+      setFilteredContacts(contatosTratados);
     } catch (error) {
       showSnackbar(error.message);
     } finally {
@@ -48,9 +54,9 @@ function Contatos() {
     };
 
     if (searchQuery) {
-      filterContacts(); // Chama o filtro quando a consulta muda
+      filterContacts(); 
     } else {
-      setFilteredContacts(contacts); // Se a consulta estiver vazia, mostrar todos os contatos
+      setFilteredContacts(contacts); 
     }
   }, [searchQuery, contacts]);
 
@@ -76,7 +82,7 @@ function Contatos() {
         <input
           type="text"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)} // Atualiza o estado do valor de busca
+          onChange={(e) => setSearchQuery(e.target.value)} 
           placeholder="Pesquisar por nome, telefone ou email"
           className="w-full p-2 rounded bg-white text-[#264f57] placeholder-[#264f57] border-2 border-[#264f57] focus:outline-none focus:ring-2 focus:ring-[#55c6b1] focus:border-transparent"
         />
@@ -108,6 +114,7 @@ function Contatos() {
               nome={contact.nome}
               email={contact.email}
               telefone={contact.telefone}
+              fotoBase64={contact.fotoBase64}
               onClick={() => openPopup(contact, false)}
             />
           ))}

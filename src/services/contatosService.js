@@ -51,19 +51,11 @@ export const todosContatosDisponveisEvento = async (eventoId) => {
     throw new Error(error.message);
   }
 };
-
-export const criarContato = async (nome, email, telefone, ativo = true) => {
+export const criarContato = async (formData) => {
   try {
-    const contato = {
-      nome,
-      email,
-      telefone,
-      ativo
-    };
-
     const response = await requisitar('/contatos', {
       method: 'POST',
-      body: JSON.stringify(contato),
+      body: formData,
     });
 
     const result = await response.json();
@@ -84,22 +76,13 @@ export const criarContato = async (nome, email, telefone, ativo = true) => {
   }
 };
 
-export const editarContato = async (id, nome, email, telefone, ativo = true) => {
+export const editarContato = async (id, formData) => {
   try {
-    // Corpo da requisição com os dados atualizados do contato
-    const contatoAtualizado = {
-      id,
-      nome,
-      email,
-      telefone,
-      ativo,
-    };
-
     const response = await requisitar(`/contatos/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(contatoAtualizado),
+      body: formData,
     });
-    
+
     const result = await response.json();
 
     if (result.sucesso) {

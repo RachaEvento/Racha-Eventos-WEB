@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { MdPerson, MdEmail, MdPhone } from "react-icons/md";
 import Cleave from 'cleave.js/react';
 import { criarContato, editarContato } from '../../services/contatosService';
@@ -6,25 +6,53 @@ import IconInputWrapper from '../../util/IconInputWrapper';
 import { useSnackbar } from '../../util/SnackbarProvider';
 import { isValidEmail } from '../../util/validadores';
 
+const toBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+};
+
+const base64ToBlob = (base64) => {
+  const [metadata, data] = base64.split(',');
+  const mime = metadata.match(/:(.*?);/)[1];
+  const binary = atob(data);
+  let array = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    array[i] = binary.charCodeAt(i);
+  }
+  return new Blob([array], { type: mime });
+};
+
 function ContatoPopup({ contact, onClose, isNew }) {
   const [editedContact, setEditedContact] = useState({
     nome: '',
     email: '',
     telefone: '',
+    fotoBase64: '', 
   });
   const [editedFields, setEditedFields] = useState({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');  
+  const [error, setError] = useState('');
   const { showSnackbar } = useSnackbar();
-
+  const fileInputRef = useRef(null); 
+  
   useEffect(() => {
     if (contact && !isNew) {
-      setEditedContact(contact);
-      setEditedFields({});
-    } else if (isNew) {
-      setEditedContact({ nome: '', email: '', telefone: '' });
-      setEditedFields({});
+      let foto = contact.fotoBase64 || '';
+      if (foto && !foto.startsWith('data:image')) {
+        foto = `data:image/jpeg;base64,${foto}`;
+      }
+      setEditedContact({
+        ...contact,
+        fotoBase64: foto
+      });
+    } else {
+      setEditedContact({ nome: '', email: '', telefone: '', fotoBase64: '' });
     }
+    setEditedFields({});
   }, [contact, isNew]);
 
   const handleChange = (field, value) => {
@@ -41,34 +69,56 @@ function ContatoPopup({ contact, onClose, isNew }) {
     setLoading(true);
     setError('');
 
-    var errorMsg = '';
-
     if (!editedContact.nome.trim()) {
-      errorMsg = 'O nome é obrigatório.';
-    } else if (editedContact.email && !isValidEmail(editedContact.email)) {
-      errorMsg = 'O e-mail é inválido.';
+      setError('O nome é obrigatório.');
+      setLoading(false);
+      return;
     }
-    
-    if (errorMsg) {
-      setError(errorMsg);      
-      setLoading(false);   
+    if (editedContact.email && !isValidEmail(editedContact.email)) {
+      setError('O e-mail é inválido.');
+      setLoading(false);
       return;
     }
 
     try {
+      const formData = new FormData();
+      formData.append('Nome', editedContact.nome);
+      formData.append('Email', editedContact.email || '');
+      formData.append('Telefone', editedContact.telefone || '');
+      formData.append('Ativo', 'true');
+
+      if (editedContact.fotoBase64) {
+        const fotoBlob = base64ToBlob(editedContact.fotoBase64);
+        formData.append('Foto', fotoBlob, 'foto.jpg');
+      }
+
       if (isNew) {
-        await criarContato(editedContact.nome, editedContact.email, editedContact.telefone);        
+        await criarContato(formData);
         showSnackbar('Contato criado com sucesso!');
       } else {
-        await editarContato(contact.id, editedContact.nome, editedContact.email, editedContact.telefone, editedContact.ativo);
+        formData.append('Id', contact.id);
+        await editarContato(contact.id, formData);
         showSnackbar('Contato editado com sucesso!');
       }
+
       onClose(true);
     } catch (err) {
-      setError(err || 'Erro ao salvar contato. Tente novamente.');
+      setError(err.message || 'Erro ao salvar contato. Tente novamente.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const base64 = await toBase64(file);
+    handleChange("fotoBase64", base64);
+    e.target.value = ''; 
   };
 
   return (
@@ -76,14 +126,34 @@ function ContatoPopup({ contact, onClose, isNew }) {
       <div className="bg-white rounded-lg p-6 w-full max-w-sm text-center relative mx-4">
         <button
           className="absolute top-2 right-2 text-[#264f57] hover:text-[#3e8682] text-2xl font-bold"
-          onClick={() => { onClose(false) }}
+          onClick={() => onClose(false)}
         >
           &times;
         </button>
+
         <div className="flex flex-col items-center">
-          <div className="w-24 h-24 rounded-full bg-[#55c6b1] flex items-center justify-center mb-4">
-            <MdPerson size={48} className="text-white" />
+          <div
+            className="w-24 h-24 rounded-full bg-[#55c6b1] flex items-center justify-center mb-4 overflow-hidden cursor-pointer"
+            onClick={handleImageClick}
+          >
+            {editedContact.fotoBase64 ? (
+              <img
+                src={editedContact.fotoBase64}
+                alt="Foto do contato"
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              <MdPerson size={48} className="text-white" />
+            )}
           </div>
+
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            className="hidden"
+            onChange={handleFileChange}
+          />
 
           <input
             type="text"
@@ -148,3 +218,4 @@ function ContatoPopup({ contact, onClose, isNew }) {
 }
 
 export default ContatoPopup;
+  
