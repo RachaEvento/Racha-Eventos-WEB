@@ -37,6 +37,7 @@ const EventoParticipantes = ({ evento }) => {
     setError(null);
     try {
       const data = await listarParticipantes(evento.id);
+      console.log(data);
       setParticipantes(data);
     } catch (err) {
       console.error("Erro ao buscar participantes:", err);
@@ -265,6 +266,24 @@ const EventoParticipantes = ({ evento }) => {
     }
   };
 
+  const getPagamentoText = (status) => {
+    switch (status) {
+      case 1: return 'Enviado';
+      case 2: return 'Recusado';
+      case 3: return 'Pago';
+      default: return 'Pendente';
+    }
+  };
+
+  const getPagamentoStyle = (status) => {
+    switch (status) {
+      case 1: return 'bg-blue-100 text-blue-800';
+      case 2: return 'bg-red-100 text-red-800';
+      case 3: return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   const convidarParticipantesPendentes = () => {
       confirmAlert({
         message: (
@@ -461,6 +480,11 @@ const EventoParticipantes = ({ evento }) => {
                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-50 uppercase tracking-wider">
                   Status
                 </th>
+                {(evento.status === 1 || evento.status === 3) && (
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-50 uppercase tracking-wider">
+                    Pagamento
+                  </th>
+                )}
                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-50 uppercase tracking-wider rounded-r-lg">
                   Ações
                 </th>
@@ -494,6 +518,16 @@ const EventoParticipantes = ({ evento }) => {
                       </span>
                     </div>
                   </td>
+                  {(evento.status === 1 || evento.status === 3) && (
+                    <td className="px-4 py-3 md:px-6 md:py-4 whitespace-nowrap block md:table-cell">
+                      <div className="flex items-center justify-between md:block">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                          ${getPagamentoStyle(participante.pago)}`}>
+                          {getPagamentoText(participante.pago)}
+                        </span>
+                      </div>
+                    </td>
+                  )}
                   <td className="px-4 py-3 md:px-6 md:py-4 whitespace-nowrap block md:table-cell">
                     <div className="flex flex-row items-start justify-around md:justify-start sm:items-center mt-1 md:mt-0">     
                       {(evento.status === 1) && (

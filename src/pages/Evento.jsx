@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { alterarStatusEvento, buscarEvento } from "../services/eventosService";
 import { useSnackbar } from "../util/SnackbarProvider";
-import { ClipLoader } from "react-spinners";
 import { MdEvent, MdPlace } from "react-icons/md";
 import { format, isSameDay } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
@@ -10,6 +9,7 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import EventoResumo from '../components/EventoResumo'
 import EventoCustos from '../components/EventoCustos'
 import EventoParticipantes from '../components/EventoParticipantes'
+import { PropagateLoader } from "react-spinners";
 
 const StatusEvento = { Aberto: 0, Fechado: 1, Cancelado: 2, Finalizado: 3 };
 
@@ -135,7 +135,7 @@ function Evento() {
     <div className="text-black p-4 md:p-6">
       {loading ? (
         <div className="flex justify-center items-center h-40">
-          <ClipLoader color="#2563EB" size={50} />
+          <PropagateLoader color="#264f57" size={15} />
         </div>
       ) : data ? (
       <div>
@@ -143,17 +143,16 @@ function Evento() {
           {/* Header */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Left: Icon and Text */}
-            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto flex-1">
               <div className="w-16 h-16 rounded-full bg-[#55c6b1] flex items-center justify-center">
                 <MdEvent size={36} className="text-white" />
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col w-full">
                 <div className="flex items-center gap-2">
                 <h1 className="flex gap-[5px] justify-center text-xl md:text-2xl font-bold text-[#264f57]">
                   {data.nome}
                 </h1>
                 </div>
-                <p className="text-[#264f57] text-sm">{data.descricao}</p>
                 <p className="text-xs text-gray-500 mt-1">
                   {isFullDay(data.dataInicio, data.dataFinal) ? (
                     <>Em <strong>{formatSimpleDate(data.dataInicio)}</strong></>
