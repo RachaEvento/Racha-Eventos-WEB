@@ -60,26 +60,27 @@ function Evento() {
   };
 
   const handleChangeStatus = async (isCancelar = false) => {
-    const nextStatus = getNextStatus(data.status);
-    if (nextStatus === null) return;
-  
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      if (isCancelar) {
-        await alterarStatusEvento(data.id, StatusEvento.Cancelado);
-      }
-      else {
-        await alterarStatusEvento(data.id, nextStatus);
-      }
+    if (isCancelar) {
+      await alterarStatusEvento(data.id, StatusEvento.Cancelado);
+    } else {
+      const nextStatus = getNextStatus(data.status);
+      if (nextStatus === null) return;
 
-      fetchEventos();
-      showSnackbar("Status atualizado com sucesso!");
-    } catch (error) {
-      showSnackbar("Erro ao atualizar status");
-      setLoading(true);
+      await alterarStatusEvento(data.id, nextStatus);
     }
-  };
+
+    await fetchEventos();
+    showSnackbar("Status atualizado com sucesso!");
+  } catch (error) {
+    showSnackbar("Erro ao atualizar status");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const formatDate = (dateString) => {
     try {
@@ -171,17 +172,20 @@ function Evento() {
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-2 md:items-center">
-                    {(data.status === 1 || data.status === 0) && (
+                    {/* Botão de Cancelar evento */}
+                    {data.status === StatusEvento.Aberto || data.status === StatusEvento.Fechado ? (
                       <button
                         onClick={() => handleChangeStatus(true)}
                         className="bg-[#c60000] text-white hover:bg-[#930000] px-4 py-1 rounded text-sm font-semibold"
                       >
                         Cancelar evento
                       </button>
-                    )}
+                    ) : null}
+
+                    {/* Botão de Avançar status */}
                     {getNextStatus(data.status) !== null && (
                       <button
-                        onClick={handleChangeStatus}
+                        onClick={() => handleChangeStatus(false)} // <-- garante que não vai cancelar!
                         className="bg-[#55c6b1] text-white hover:bg-[#3e8682] px-4 py-1 rounded text-sm font-semibold shadow"
                       >
                         {getNextStatusLabel(data.status)}
