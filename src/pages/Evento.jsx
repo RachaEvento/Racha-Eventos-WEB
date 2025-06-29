@@ -25,7 +25,7 @@ function Evento() {
     try {
       const result = await buscarEvento(id);
       setData(result);
-      console.log(result);
+      //console.log(result);
     } catch (error) {
       showSnackbar(error.message || "Erro ao buscar evento");
     } finally {

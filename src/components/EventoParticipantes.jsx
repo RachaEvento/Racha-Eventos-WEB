@@ -11,8 +11,7 @@ import { IoMdCloseCircle } from "react-icons/io";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Estilo padrão do popup
 
-// --- ADDED IMPORT FOR CLIPLOADER ---
-import { ClipLoader } from 'react-spinners';
+import { PropagateLoader } from 'react-spinners';
 import ConvidarContatoPopup from './popups/ConvidarContatoPopup';
 import PagamentoParticipantePopup from './popups/PagamentoParticipantePopup';
 
@@ -37,7 +36,7 @@ const EventoParticipantes = ({ evento }) => {
     setError(null);
     try {
       const data = await listarParticipantes(evento.id);
-      console.log(data);
+      //console.log(data);
       setParticipantes(data);
     } catch (err) {
       console.error("Erro ao buscar participantes:", err);
@@ -139,7 +138,7 @@ const EventoParticipantes = ({ evento }) => {
 
   const handleConvidar = (participante) => {
     const linkConvite = `${window.location.protocol}//${window.location.host}/convite/${participante.id}`;
-    console.log(participante);
+    //console.log(participante);
     if (participante.email?.trim() !== '') {
       confirmAlert({
         message: (
@@ -385,7 +384,7 @@ const EventoParticipantes = ({ evento }) => {
   if (loading) {
     return (
       <div className="p-6 flex justify-center items-center bg-white rounded-lg shadow-md min-h-[200px]">
-        <ClipLoader
+        <PropagateLoader
           color={"#55C6B1"} // Color matching your table header
           loading={loading}
           size={50}

@@ -4,7 +4,7 @@ export const todosLocais = async () => {
   try {    
     
     // Fake delay of 1 second
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    //await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const response = await requisitar('/locais');
 

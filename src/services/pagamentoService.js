@@ -90,7 +90,7 @@ export const recusarPagamento = async (pagamentoId) => {
 export const listarPagamentosParticipante = async (participanteId) => {
   try {
     const response = await requisitar(`/pagamento/${participanteId}/listar`);
-    console.log(response)
+    //console.log(response)
 
     const result = await response.json();
 

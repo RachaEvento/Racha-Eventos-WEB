@@ -66,6 +66,8 @@ function Configuracoes() {
           return;
         }
         break;
+      default:
+        break;
     }
 
     try {

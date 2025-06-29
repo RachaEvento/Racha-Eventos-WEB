@@ -11,7 +11,7 @@ import {
   MdReceipt
 } from 'react-icons/md';
 
-import { ClipLoader } from 'react-spinners';
+import { PropagateLoader } from 'react-spinners';
 import { useSnackbar } from '../../util/SnackbarProvider';
 
 const statusMap = {
@@ -81,7 +81,7 @@ const PagamentoParticipantePopup = ({ participante, onClose, evento }) => {
 
         {loading ? (
           <div className="flex justify-center items-center h-40">
-            <ClipLoader size={50} color="#264F57" />
+            <PropagateLoader size={50} color="#264F57" />
           </div>
         ) : error ? (
           <p className="text-red-600">{error}</p>

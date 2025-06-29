@@ -35,7 +35,11 @@ const EventoCustos = ({ evento }) => {
   }, [carregarListas]);
 
   const handleCriarLista = async () => {
-    if (!nomeNovaLista) return;
+    if (!nomeNovaLista) 
+    {
+      showSnackbar('Digite um nome para lista!');
+      return;
+    }
 
     try {
       await criarListaCusto(evento.id, { nome: nomeNovaLista });

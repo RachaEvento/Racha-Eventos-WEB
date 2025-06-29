@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { buscarConvite, confirmarParticipacao, recusarParticipacao } from '../services/conviteService';
-import { ClipLoader } from 'react-spinners';
+import { PropagateLoader } from 'react-spinners';
 import { format, isSameDay } from 'date-fns';
 import ptBR from "date-fns/locale/pt-BR";
 import { MdPlace } from 'react-icons/md';
@@ -64,7 +64,7 @@ const Convite = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gradient-radial">
-        <ClipLoader color="#fff" size={60} />
+        <PropagateLoader color="#fff" size={60} />
       </div>
     );
   }

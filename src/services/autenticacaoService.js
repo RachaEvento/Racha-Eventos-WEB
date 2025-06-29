@@ -9,7 +9,7 @@ export const login = async (email, password) => {
 
   const data = await response.json();
   if (!response.ok) {
-    console.log(response);
+    //console.log(response);
     throw new Error(data.message || 'Erro ao realizar login');
   }
 
@@ -25,7 +25,7 @@ export const registrar = async (nome, email, numero, password) => {
   });
 
   const data = await response.json();
-  console.log(data);
+  //console.log(data);
   if (!response.ok) throw new Error(data.mensagem || 'Erro ao realizar cadastro');
 
   return data;

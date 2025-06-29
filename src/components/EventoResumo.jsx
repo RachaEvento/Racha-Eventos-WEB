@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { resumoEvento } from '../services/relatorioService';
 import {
   MdEvent,
-  MdLocationOn,
   MdPerson,
   MdPeople,
   MdCheckCircle,

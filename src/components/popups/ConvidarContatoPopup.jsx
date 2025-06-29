@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { todosContatosDisponveisEvento } from '../../services/contatosService';
 import { adicionarParticipantes } from '../../services/participanteService';
 import { useSnackbar } from '../../util/SnackbarProvider';
-import { ClipLoader } from "react-spinners";
+import { PropagateLoader } from "react-spinners";
 
 const ConvidarContatoPopup = ({ evento, onClose }) => {
   const [contatos, setContatos] = useState([]);
@@ -93,7 +93,7 @@ const ConvidarContatoPopup = ({ evento, onClose }) => {
               {carregando ? (
                 <tr>
                   <td colSpan="3" className="p-4 text-center">
-                    <ClipLoader
+                    <PropagateLoader
                       color={"#55C6B1"}
                       loading={carregando}
                       size={50}

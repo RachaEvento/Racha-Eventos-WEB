@@ -12,9 +12,7 @@ export const SnackbarProvider = ({ children }) => {
 
   const showSnackbar = useCallback((message) => {
     setSnackbar({ message, open: true });
-    setTimeout(() => {
-      setSnackbar({ message: '', open: false });
-    }, 3000);
+    setTimeout(() => { setSnackbar({ message: '', open: false }); }, 3000);
   }, []);
 
   useEffect(() => {

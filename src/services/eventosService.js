@@ -3,7 +3,7 @@ import { requisitar } from '../util/requisicaoApi';
 // Buscar todos os eventos
 export const todosEventos = async () => {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    //await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const response = await requisitar('/eventos');
     const result = await response.json();
@@ -27,7 +27,7 @@ export const todosEventos = async () => {
 // Buscar evento por ID
 export const buscarEvento = async (id) => {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    //await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const response = await requisitar(`/eventos/${id}`);
     const result = await response.json();
