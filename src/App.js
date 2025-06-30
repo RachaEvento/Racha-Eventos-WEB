@@ -11,7 +11,6 @@ import Eventos from "./pages/Eventos";
 import Evento from "./pages/Evento";
 import Convite from "./pages/Convite";
 import Cobrar from "./pages/Cobrar";
-import AjudaButton from "./components/AjudaButton";
 import DocumentacaoPage from "./pages/Documentacao/DocumentacaoPage";
 
 function App() {
@@ -29,7 +28,6 @@ function App() {
         <Route path="/cobrar/:id" element={<Cobrar />} />
         <Route path="/documentacao" element={<DocumentacaoPage />} />
       </Routes>
-      <AjudaButton />
      </Router>
     </SnackbarProvider>
   );

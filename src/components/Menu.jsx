@@ -6,7 +6,8 @@ import {
     FiPhone,
     FiSettings,
     FiLogOut,
-    FiMapPin, // Ícone correto para Locais
+    FiMapPin,
+    FiHelpCircle, // Ícone correto para Locais
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
@@ -98,6 +99,13 @@ const Menu = ({ children }) => {
                         </button>
 
                         <button
+                            onClick={() => handleNavigate("/documentacao")}
+                            className="text-white py-3 px-4 hover:text-gray-200 transition flex items-center gap-3">
+                            <FiHelpCircle />
+                            Ajuda
+                        </button>
+
+                        <button
                             onClick={handleLogout}
                             className="text-white py-3 px-4 hover:bg-red-500 hover:text-white transition flex items-center gap-3 rounded-lg"
                         >
@@ -146,11 +154,19 @@ const Menu = ({ children }) => {
                     </div>
                 </div>
 
-                <div onClick={() => navigate("/configuracoes")}
-                     className="flex flex-col gap-3">
-                    <button className="text-white py-3 px-5 hover:text-gray-200 transition flex items-center gap-3">
+                <div className="flex flex-col gap-3">
+                    <button 
+                        className="text-white py-3 px-5 hover:text-gray-200 transition flex items-center gap-3"
+                        onClick={() => navigate("/configuracoes")}>
                         <FiSettings />
                         Configurações
+                    </button>
+
+                    <button 
+                        className="text-white py-3 px-5 hover:text-gray-200 transition flex items-center gap-3"
+                        onClick={() => navigate("/documentacao")}>
+                        <FiHelpCircle />
+                        Ajuda
                     </button>
 
                     <button
