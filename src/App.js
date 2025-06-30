@@ -11,6 +11,8 @@ import Eventos from "./pages/Eventos";
 import Evento from "./pages/Evento";
 import Convite from "./pages/Convite";
 import Cobrar from "./pages/Cobrar";
+import AjudaButton from "./components/AjudaButton";
+import DocumentacaoPage from "./pages/Documentacao/DocumentacaoPage";
 
 function App() {
   return (
@@ -25,8 +27,10 @@ function App() {
         <Route path="/configuracoes" element={<RotaProtegida><Menu><Configuracoes /></Menu></RotaProtegida>} />
         <Route path="/convite/:id" element={<Convite />} />
         <Route path="/cobrar/:id" element={<Cobrar />} />
+        <Route path="/documentacao" element={<DocumentacaoPage />} />
       </Routes>
-    </Router>
+      <AjudaButton />
+     </Router>
     </SnackbarProvider>
   );
 }
